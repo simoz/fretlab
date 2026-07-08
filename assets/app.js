@@ -190,12 +190,9 @@ function displayTone(tone) {
   return `${noteNameForRole(tone.pc, tone.role)} ${tone.role}`;
 }
 
-function renderToneList(id, tones) {
-  if (!els[id]) return;
-
-  els[id].innerHTML = "";
-  els[id].classList.add("tone-list");
-  els[id].setAttribute("aria-label", tones.map(displayTone).join(", "));
+function appendToneItems(container, tones) {
+  container.classList.add("tone-list");
+  container.setAttribute("aria-label", tones.map(displayTone).join(", "));
 
   tones.forEach((tone) => {
     const pair = document.createElement("span");
@@ -209,8 +206,15 @@ function renderToneList(id, tones) {
     role.textContent = tone.role;
 
     pair.append(note, role);
-    els[id].append(pair);
+    container.append(pair);
   });
+}
+
+function renderToneList(id, tones) {
+  if (!els[id]) return;
+
+  els[id].innerHTML = "";
+  appendToneItems(els[id], tones);
 }
 
 function scaleColor(scaleKey) {
@@ -979,7 +983,7 @@ function renderScalePalette() {
     const label = document.createElement("span");
     const notes = document.createElement("strong");
     label.textContent = scale.label;
-    notes.textContent = scaleNotes(scaleKey).map(displayTone).join("  ");
+    appendToneItems(notes, scaleNotes(scaleKey));
     row.append(label, notes);
     els.scalePaletteList.append(row);
   });
