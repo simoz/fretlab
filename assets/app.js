@@ -5,6 +5,7 @@ const {
   DEGREE_INTERVALS,
   CHORDS,
   TRIAD_QUALITY_OPTIONS,
+  CHORD_LIBRARY_OPTIONS,
   SCALES,
   PROGRESSIONS,
   VOCABULARY,
@@ -18,7 +19,10 @@ const {
 } = window.FretLabData;
 
 const STORAGE_KEY = "fretlab-state-v1";
+const STORAGE_SCHEMA_VERSION = 2;
 const SCALE_KEYS = Object.keys(SCALES);
+const INVERSION_ALL = "all";
+const CHORD_LIBRARY_MAX_PER_INVERSION = 12;
 const DEFAULT_SCALE_LAYERS = {
   minorBlues: true
 };
@@ -55,10 +59,17 @@ const PAGE_CONFIGS = {
     focusModes: ["all", "triadTones", "rootFifth"],
     allowedLayers: ["triads", "rootFifth"],
     defaultLayers: { triads: true }
+  },
+  chords: {
+    defaultFocus: "all",
+    focusModes: ["all", "chordTones", "rootFifth"],
+    allowedLayers: ["arpeggio", "rootFifth"],
+    defaultLayers: { arpeggio: true }
   }
 };
 
 const state = {
+  storageVersion: STORAGE_SCHEMA_VERSION,
   instrument: "guitar",
   tuning: "standard",
   keyIndex: 0,
@@ -70,6 +81,8 @@ const state = {
   position: "full",
   focusMode: "all",
   triadQuality: "maj",
+  chordQuality: "maj",
+  chordInversion: INVERSION_ALL,
   layers: {
     ...Object.fromEntries(SCALE_KEYS.map((scaleKey) => [scaleKey, Boolean(DEFAULT_SCALE_LAYERS[scaleKey])])),
     arpeggio: true,
@@ -177,6 +190,29 @@ function displayTone(tone) {
   return `${noteNameForRole(tone.pc, tone.role)} ${tone.role}`;
 }
 
+function renderToneList(id, tones) {
+  if (!els[id]) return;
+
+  els[id].innerHTML = "";
+  els[id].classList.add("tone-list");
+  els[id].setAttribute("aria-label", tones.map(displayTone).join(", "));
+
+  tones.forEach((tone) => {
+    const pair = document.createElement("span");
+    const note = document.createElement("span");
+    const role = document.createElement("span");
+
+    pair.className = "tone-pair";
+    note.className = "tone-note";
+    role.className = "tone-role";
+    note.textContent = noteNameForRole(tone.pc, tone.role);
+    role.textContent = tone.role;
+
+    pair.append(note, role);
+    els[id].append(pair);
+  });
+}
+
 function scaleColor(scaleKey) {
   const index = Math.max(0, SCALE_KEYS.indexOf(scaleKey));
   return SCALE_COLORS[index % SCALE_COLORS.length];
@@ -208,14 +244,19 @@ function currentBarData() {
   return currentProgression().bars[state.currentBar] || currentProgression().bars[0];
 }
 
-function chordForBar(barData) {
-  const rootPc = pc(currentKey().pc + DEGREE_INTERVALS[barData.degree]);
-  const chord = CHORDS[barData.quality];
-  const tones = chord.intervals.map((interval, index) => ({
+function chordTonesFor(rootPc, chord) {
+  return chord.intervals.map((interval, index) => ({
     pc: pc(rootPc + interval),
+    interval,
     role: chord.roles[index],
     target: chord.targets.includes(index)
   }));
+}
+
+function chordForBar(barData) {
+  const rootPc = pc(currentKey().pc + DEGREE_INTERVALS[barData.degree]);
+  const chord = CHORDS[barData.quality];
+  const tones = chordTonesFor(rootPc, chord);
 
   return {
     rootPc,
@@ -231,17 +272,29 @@ function chordForBar(barData) {
 function triadForSelection() {
   const rootPc = currentKey().pc;
   const chord = CHORDS[state.triadQuality] || CHORDS.maj;
-  const tones = chord.intervals.map((interval, index) => ({
-    pc: pc(rootPc + interval),
-    role: chord.roles[index],
-    target: chord.targets.includes(index)
-  }));
+  const tones = chordTonesFor(rootPc, chord);
 
   return {
     rootPc,
     quality: state.triadQuality,
     roman: "",
     name: `${noteName(rootPc)}${chord.suffix ?? state.triadQuality}`,
+    functionName: chord.name,
+    tones,
+    targets: tones.filter((tone) => tone.target)
+  };
+}
+
+function chordLibrarySelection() {
+  const rootPc = currentKey().pc;
+  const chord = CHORDS[state.chordQuality] || CHORDS.maj;
+  const tones = chordTonesFor(rootPc, chord);
+
+  return {
+    rootPc,
+    quality: state.chordQuality,
+    roman: "",
+    name: `${noteName(rootPc)}${chord.suffix ?? state.chordQuality}`,
     functionName: chord.name,
     tones,
     targets: tones.filter((tone) => tone.target)
@@ -263,6 +316,7 @@ function scaleReference() {
 }
 
 function currentChord() {
+  if (currentTool() === "chords") return chordLibrarySelection();
   if (currentTool() === "triads") return triadForSelection();
   if (currentTool() === "scales") return scaleReference();
   return chordForBar(currentBarData());
@@ -373,6 +427,221 @@ function chordTabMarkup(chord) {
       <span class="chord-tab-popover" aria-hidden="true">${lines}</span>
     </span>
   `;
+}
+
+function stringBasePitchesHighToLow(strings) {
+  if (!strings.length) return [];
+
+  const pitches = [60 + strings[0].pc];
+  for (let index = 1; index < strings.length; index += 1) {
+    let pitch = pitches[index - 1] - 1;
+    while (pc(pitch) !== strings[index].pc) pitch -= 1;
+    pitches.push(pitch);
+  }
+
+  return pitches;
+}
+
+function chordLibraryWindows(range, maxStretch) {
+  const windows = [];
+
+  if (range.start === 0) {
+    windows.push({ start: 0, end: Math.min(range.end, maxStretch) });
+  }
+
+  for (let start = Math.max(1, range.start); start <= range.end; start += 1) {
+    windows.push({ start, end: Math.min(range.end, start + maxStretch) });
+  }
+
+  return windows;
+}
+
+function chordIdentityRoles(chord, stringCount) {
+  const roles = chord.tones.map((tone) => tone.role);
+  if (roles.length <= stringCount) return roles;
+
+  const required = ["R"];
+  const colorRole = roles.find((role) => ["3", "b3", "4", "2"].includes(role));
+  const seventhRole = roles.find((role) => ["7", "b7", "bb7"].includes(role));
+
+  if (colorRole) required.push(colorRole);
+  if (seventhRole) required.push(seventhRole);
+  if (roles.includes("6")) required.push("6");
+  if (roles.includes("9")) required.push("9");
+
+  return [...new Set(required)].slice(0, stringCount);
+}
+
+function chordIdentityCovered(roles, chord, stringCount) {
+  const roleSet = new Set(roles);
+  const distinctTarget = Math.min(chord.tones.length, stringCount);
+  if (roleSet.size < distinctTarget) return false;
+  return chordIdentityRoles(chord, stringCount).every((role) => roleSet.has(role));
+}
+
+function chordLibraryMaxStretch(stringCount) {
+  return stringCount >= 6 ? 4 : 5;
+}
+
+function chordLibraryMinPlayed(chord, stringCount) {
+  return Math.min(stringCount, Math.max(2, chord.tones.length));
+}
+
+function scoreChordLibraryVoicing(voicing, chord, stringPitches, maxStretch) {
+  const stringCount = voicing.length;
+  const played = voicing.flatMap((item, stringIndex) => {
+    if (item.fret === null) return [];
+    return [{
+      ...item,
+      stringIndex,
+      pitch: stringPitches[stringIndex] + item.fret
+    }];
+  });
+
+  if (played.length < chordLibraryMinPlayed(chord, stringCount)) return null;
+
+  const playedRoles = played.map((item) => item.role);
+  if (!chordIdentityCovered(playedRoles, chord, stringCount)) return null;
+
+  const frets = played.map((item) => item.fret);
+  const span = Math.max(...frets) - Math.min(...frets);
+  if (span > maxStretch) return null;
+
+  const firstPlayed = voicing.findIndex((item) => item.fret !== null);
+  let lastPlayed = voicing.length - 1;
+  while (lastPlayed >= 0 && voicing[lastPlayed].fret === null) lastPlayed -= 1;
+  const innerMutes = voicing.slice(firstPlayed, lastPlayed + 1).filter((item) => item.fret === null).length;
+  if (innerMutes > 1) return null;
+
+  const lowest = played.reduce((lowestItem, item) => (item.pitch < lowestItem.pitch ? item : lowestItem), played[0]);
+  const inversionIndex = chord.tones.findIndex((tone) => tone.role === lowest.role);
+  if (inversionIndex < 0) return null;
+
+  const muted = voicing.length - played.length;
+  const openStrings = played.filter((item) => item.fret === 0).length;
+  const fretSum = frets.reduce((sum, fret) => sum + fret, 0);
+  const duplicatedRoles = played.length - new Set(playedRoles).size;
+  const rootCount = playedRoles.filter((role) => role === "R").length;
+
+  let score = 0;
+  score += span * 16;
+  score += innerMutes * 22;
+  score += muted * 8;
+  score += fretSum * 0.35;
+  score += duplicatedRoles * 2;
+  score -= openStrings * 4;
+  score -= played.length * 1.5;
+  score -= rootCount;
+
+  return {
+    score,
+    voicing: voicing.map((item) => ({ ...item })),
+    frets: voicing.map((item) => item.fret),
+    played,
+    span,
+    muted,
+    inversionIndex,
+    bassRole: lowest.role,
+    bassPc: lowest.pc
+  };
+}
+
+function chordLibraryVoicings(chord) {
+  const tuning = currentTuning();
+  const range = visibleFretRange();
+  const stringPitches = stringBasePitchesHighToLow(tuning.tuning);
+  const maxStretch = chordLibraryMaxStretch(tuning.tuning.length);
+  const windows = chordLibraryWindows(range, maxStretch);
+  const voicings = new Map();
+
+  windows.forEach((windowRange) => {
+    const candidateLists = tuning.tuning.map((string) => {
+      const candidates = [];
+
+      for (let fret = windowRange.start; fret <= windowRange.end; fret += 1) {
+        const tone = chordToneForPc(chord, pc(string.pc + fret));
+        if (tone) {
+          candidates.push({
+            fret,
+            role: tone.role,
+            pc: tone.pc
+          });
+        }
+      }
+
+      candidates.push({ fret: null, role: "x", pc: null });
+      return candidates;
+    });
+
+    const current = [];
+    const walk = (stringIndex) => {
+      if (stringIndex === candidateLists.length) {
+        const scored = scoreChordLibraryVoicing(current, chord, stringPitches, maxStretch);
+        if (!scored) return;
+
+        const key = scored.frets.map((fret) => fret ?? "x").join("-");
+        const existing = voicings.get(key);
+        if (!existing || scored.score < existing.score) voicings.set(key, scored);
+        return;
+      }
+
+      candidateLists[stringIndex].forEach((candidate) => {
+        current[stringIndex] = candidate;
+        walk(stringIndex + 1);
+      });
+    };
+
+    walk(0);
+  });
+
+  return [...voicings.values()].sort((a, b) => a.score - b.score);
+}
+
+function chordInversionId(index) {
+  return `inv-${index}`;
+}
+
+function chordInversionName(index) {
+  if (index === 0) return "Root position";
+  const names = ["", "1st inversion", "2nd inversion", "3rd inversion", "4th inversion", "5th inversion"];
+  return names[index] || `${index}th inversion`;
+}
+
+function chordInversionShortName(index) {
+  if (index === 0) return "Root";
+  const names = ["", "1st", "2nd", "3rd", "4th", "5th"];
+  return names[index] || `${index}th`;
+}
+
+function chordInversionOptions(chord, voicings) {
+  return chord.tones.map((tone, index) => ({
+    id: chordInversionId(index),
+    index,
+    role: tone.role,
+    label: chordInversionName(index),
+    shortLabel: chordInversionShortName(index),
+    count: voicings.filter((voicing) => voicing.inversionIndex === index).length
+  })).filter((option) => option.count > 0);
+}
+
+function chordLibraryDisplayVoicings(voicings) {
+  if (state.chordInversion !== INVERSION_ALL) {
+    return voicings.slice(0, CHORD_LIBRARY_MAX_PER_INVERSION * 2);
+  }
+
+  const grouped = new Map();
+  voicings.forEach((voicing) => {
+    if (!grouped.has(voicing.inversionIndex)) grouped.set(voicing.inversionIndex, []);
+    grouped.get(voicing.inversionIndex).push(voicing);
+  });
+
+  return [...grouped.keys()].sort((a, b) => a - b).flatMap((index) => (
+    grouped.get(index).slice(0, CHORD_LIBRARY_MAX_PER_INVERSION)
+  ));
+}
+
+function formatVoicingFrets(frets) {
+  return frets.slice().reverse().map((fret) => fret ?? "x").join(" ");
 }
 
 function scaleNotes(scaleKey) {
@@ -664,20 +933,21 @@ function renderDetails() {
   const chord = currentChord();
   const instrument = currentInstrument();
   const tuning = currentTuning();
+  const fallbackBadge = currentTool() === "chords" ? "Chord" : "Triad";
 
   setText("sessionInstrument", instrument.label);
   setText("sessionTuning", tuning.label);
   setText("sessionKey", key.label);
   setText("sessionBar", String(state.currentBar + 1));
   setText("sessionChord", chord.name);
-  setText("currentRoman", chord.roman || "Triad");
+  setText("currentRoman", chord.roman || fallbackBadge);
   setText("currentChordName", chord.name);
   setText("currentChordFunction", chord.roman ? `${chord.roman} in ${key.label} - ${chord.functionName}` : `${chord.functionName} on ${key.label}`);
-  setText("chordToneList", chord.tones.map(displayTone).join("  "));
-  setText("triadToneList", triadTones(chord).map(displayTone).join("  "));
-  setText("targetNoteList", chord.targets.map(displayTone).join("  "));
-  setText("guideToneList", guideTones(chord).map(displayTone).join("  "));
-  setText("rootFifthList", rootFifthTones(chord).map(displayTone).join("  "));
+  renderToneList("chordToneList", chord.tones);
+  renderToneList("triadToneList", triadTones(chord));
+  renderToneList("targetNoteList", chord.targets);
+  renderToneList("guideToneList", guideTones(chord));
+  renderToneList("rootFifthList", rootFifthTones(chord));
   renderScalePalette();
   setText("suggestedVocabularySummary", suggestedVocabularyKeys(chord).map((key) => VOCABULARY[key].label).join(", ") || "None");
   setText("vocabularySummary", activeVocabularyItems().map(([, item]) => item.label).join(", ") || "None selected");
@@ -715,11 +985,214 @@ function renderScalePalette() {
   });
 }
 
+function renderChordLibrary() {
+  if (!els.chordLibraryGrid) return;
+
+  const chord = currentChord();
+  const allVoicings = chordLibraryVoicings(chord);
+  const inversionOptions = chordInversionOptions(chord, allVoicings);
+  const validInversions = new Set([INVERSION_ALL, ...inversionOptions.map((option) => option.id)]);
+  if (!validInversions.has(state.chordInversion)) state.chordInversion = INVERSION_ALL;
+
+  renderChordInversionFilters(inversionOptions, allVoicings.length);
+
+  const selectedVoicings = state.chordInversion === INVERSION_ALL
+    ? allVoicings
+    : allVoicings.filter((voicing) => chordInversionId(voicing.inversionIndex) === state.chordInversion);
+  const displayVoicings = chordLibraryDisplayVoicings(selectedVoicings);
+  const selectedCount = selectedVoicings.length;
+  const shownLabel = displayVoicings.length === selectedCount
+    ? String(selectedCount)
+    : `${displayVoicings.length} of ${selectedCount}`;
+  const inversionWord = inversionOptions.length === 1 ? "inversion" : "inversions";
+
+  setText(
+    "chordLibrarySummary",
+    allVoicings.length
+      ? `${chord.name}: showing ${shownLabel} practical voicings across ${inversionOptions.length} ${inversionWord}.`
+      : `${chord.name}: no practical voicings in the selected fret range.`
+  );
+
+  els.chordLibraryGrid.innerHTML = "";
+  if (els.chordLibraryEmpty) els.chordLibraryEmpty.hidden = displayVoicings.length > 0;
+
+  displayVoicings.forEach((voicing) => {
+    els.chordLibraryGrid.append(renderChordCard(chord, voicing));
+  });
+}
+
+function renderChordInversionFilters(inversionOptions, totalCount) {
+  if (!els.chordInversionFilters) return;
+
+  els.chordInversionFilters.innerHTML = "";
+  const filters = [
+    {
+      id: INVERSION_ALL,
+      label: "All inversions",
+      count: totalCount
+    },
+    ...inversionOptions.map((option) => ({
+      id: option.id,
+      label: `${option.shortLabel} (${option.role} bass)`,
+      count: option.count
+    }))
+  ];
+
+  filters.forEach((filter) => {
+    const button = document.createElement("button");
+    const isActive = state.chordInversion === filter.id;
+    button.type = "button";
+    button.className = `btn chord-inversion-button${isActive ? " is-active" : ""}`;
+    button.dataset.inversion = filter.id;
+    button.setAttribute("aria-pressed", isActive ? "true" : "false");
+
+    const label = document.createElement("span");
+    const count = document.createElement("strong");
+    label.textContent = filter.label;
+    count.textContent = String(filter.count);
+    button.append(label, count);
+    button.addEventListener("click", () => {
+      state.chordInversion = filter.id;
+      saveState();
+      render();
+    });
+
+    els.chordInversionFilters.append(button);
+  });
+}
+
+function renderChordCard(chord, voicing) {
+  const card = document.createElement("article");
+  const inversionName = chordInversionName(voicing.inversionIndex);
+  const shape = formatVoicingFrets(voicing.frets);
+  card.className = "chord-card";
+  card.setAttribute("aria-label", `${chord.name}, ${inversionName}, shape ${shape}`);
+
+  const heading = document.createElement("div");
+  heading.className = "chord-card-heading";
+
+  const title = document.createElement("div");
+  const chordName = document.createElement("strong");
+  const inversion = document.createElement("span");
+  chordName.textContent = chord.name;
+  inversion.textContent = inversionName;
+  title.append(chordName, inversion);
+
+  const shapeBadge = document.createElement("span");
+  shapeBadge.className = "shape-badge";
+  shapeBadge.textContent = shape;
+
+  heading.append(title, shapeBadge);
+  card.append(heading, renderChordDiagram(voicing));
+
+  const meta = document.createElement("div");
+  meta.className = "chord-card-meta";
+  [
+    ["Bass", `${noteNameForRole(voicing.bassPc, voicing.bassRole)} ${voicing.bassRole}`],
+    ["Played", `${voicing.played.length} strings`],
+    ["Span", `${voicing.span} frets`]
+  ].forEach(([labelText, valueText]) => {
+    const item = document.createElement("div");
+    const label = document.createElement("span");
+    const value = document.createElement("strong");
+    label.textContent = labelText;
+    value.textContent = valueText;
+    item.append(label, value);
+    meta.append(item);
+  });
+  card.append(meta);
+
+  return card;
+}
+
+function renderChordDiagram(voicing) {
+  const tuning = currentTuning();
+  const stringsHighToLow = tuning.tuning.map((string, index) => ({
+    ...string,
+    index,
+    item: voicing.voicing[index]
+  }));
+  const playedFrets = voicing.frets.filter((fret) => fret !== null);
+  const fretted = playedFrets.filter((fret) => fret > 0);
+  const hasOpenStrings = playedFrets.includes(0);
+  const minFret = fretted.length ? Math.min(...fretted) : 1;
+  const maxFret = fretted.length ? Math.max(...fretted) : 1;
+  const startFret = hasOpenStrings || minFret <= 4 ? 1 : minFret;
+  const visibleFretCount = Math.max(4, Math.min(6, maxFret - startFret + 1));
+  const frets = Array.from({ length: visibleFretCount }, (_item, index) => startFret + index);
+
+  const diagram = document.createElement("div");
+  diagram.className = "chord-diagram";
+  diagram.style.setProperty("--fret-count", String(frets.length));
+  const markerStringIndex = Math.floor(stringsHighToLow.length / 2);
+
+  const header = document.createElement("div");
+  header.className = "chord-diagram-header";
+  const stringHeader = document.createElement("span");
+  const statusHeader = document.createElement("span");
+  statusHeader.textContent = "0";
+  header.append(stringHeader, statusHeader);
+  frets.forEach((fret) => {
+    const label = document.createElement("span");
+    label.textContent = String(fret);
+    header.append(label);
+  });
+
+  const rows = document.createElement("div");
+  rows.className = "chord-diagram-rows";
+
+  stringsHighToLow.forEach((string, stringIndex) => {
+    const row = document.createElement("div");
+    row.className = "chord-diagram-row";
+
+    const label = document.createElement("span");
+    label.className = "diagram-string-label";
+    label.textContent = string.label;
+    row.append(label);
+
+    const status = document.createElement("div");
+    status.className = "diagram-status-cell";
+    if (string.item.fret === null) {
+      const mute = document.createElement("span");
+      mute.className = "diagram-mute";
+      mute.textContent = "x";
+      status.append(mute);
+    } else if (string.item.fret === 0) {
+      status.append(renderDiagramDot(string.item));
+    }
+    row.append(status);
+
+    frets.forEach((fret) => {
+      const cell = document.createElement("div");
+      cell.className = `diagram-cell${startFret === 1 && fret === 1 ? " is-nut-adjacent" : ""}${FRET_MARKERS.has(fret) && stringIndex === markerStringIndex ? " has-marker" : ""}`;
+      if (string.item.fret === fret) {
+        cell.append(renderDiagramDot(string.item));
+      }
+      row.append(cell);
+    });
+
+    rows.append(row);
+  });
+
+  diagram.append(header, rows);
+  return diagram;
+}
+
+function renderDiagramDot(item) {
+  const dot = document.createElement("span");
+  dot.className = `diagram-dot${item.role === "R" ? " root" : ""}`;
+  dot.textContent = state.labelMode === "intervals" ? item.role : noteNameForRole(item.pc, item.role);
+  dot.title = `${noteNameForRole(item.pc, item.role)} ${item.role}`;
+
+  return dot;
+}
+
 function render() {
   renderProgression();
   renderFretboard();
   renderDetails();
   renderVocabulary();
+  renderChordLibrary();
   syncControls();
 }
 
@@ -755,6 +1228,7 @@ function syncControls() {
   if (els.progressionFamily) els.progressionFamily.value = state.progressionFamily;
   if (els.progressionSelect) els.progressionSelect.value = state.progression;
   if (els.triadQualitySelect) els.triadQualitySelect.value = state.triadQuality;
+  if (els.chordQualitySelect) els.chordQualitySelect.value = state.chordQuality;
   if (els.labelMode) els.labelMode.value = state.labelMode;
   if (els.fretCount) els.fretCount.value = String(state.fretCount);
   if (els.positionSelect) els.positionSelect.value = state.position;
@@ -778,6 +1252,7 @@ function loadState() {
 
   try {
     const saved = JSON.parse(raw);
+    const savedVersion = Number.isInteger(saved.storageVersion) ? saved.storageVersion : 1;
     state.instrument = INSTRUMENTS[saved.instrument] ? saved.instrument : state.instrument;
     state.tuning = typeof saved.tuning === "string" ? saved.tuning : state.tuning;
     if (!currentTuningOptions()[state.tuning]) state.tuning = currentInstrument().defaultTuning;
@@ -792,7 +1267,12 @@ function loadState() {
     state.position = FRET_POSITIONS[saved.position] ? saved.position : state.position;
     state.focusMode = ["all", "chordTones", "triadTones", "guideTones", "targetNotes", "rootFifth"].includes(saved.focusMode) ? saved.focusMode : state.focusMode;
     state.triadQuality = CHORDS[saved.triadQuality] ? saved.triadQuality : state.triadQuality;
+    state.chordQuality = CHORDS[saved.chordQuality] ? saved.chordQuality : state.chordQuality;
+    state.chordInversion = saved.chordInversion === INVERSION_ALL || /^inv-\d+$/.test(saved.chordInversion || "") ? saved.chordInversion : state.chordInversion;
     state.layers = { ...state.layers, ...saved.layers };
+    if (savedVersion < STORAGE_SCHEMA_VERSION) {
+      state.layers.majorBlues = Boolean(DEFAULT_SCALE_LAYERS.majorBlues);
+    }
     state.vocabulary = { ...DEFAULT_VOCABULARY, ...saved.vocabulary };
   } catch (_error) {
     localStorage.removeItem(STORAGE_KEY);
@@ -839,6 +1319,15 @@ function populateControls() {
       option.value = quality.value;
       option.textContent = quality.label;
       els.triadQualitySelect.append(option);
+    });
+  }
+
+  if (els.chordQualitySelect) {
+    CHORD_LIBRARY_OPTIONS.forEach((quality) => {
+      const option = document.createElement("option");
+      option.value = quality.value;
+      option.textContent = quality.label;
+      els.chordQualitySelect.append(option);
     });
   }
 
@@ -1024,6 +1513,13 @@ function bindEvents() {
     render();
   });
 
+  bindIfPresent(els.chordQualitySelect, "change", (event) => {
+    state.chordQuality = event.target.value;
+    state.chordInversion = INVERSION_ALL;
+    saveState();
+    render();
+  });
+
   bindIfPresent(els.labelMode, "change", (event) => {
     state.labelMode = event.target.value;
     saveState();
@@ -1092,6 +1588,7 @@ function cacheElements() {
     "progressionFamily",
     "progressionSelect",
     "triadQualitySelect",
+    "chordQualitySelect",
     "barSelect",
     "prevBar",
     "nextBar",
@@ -1110,6 +1607,10 @@ function cacheElements() {
     "suggestedVocabularySummary",
     "vocabularySummary",
     "progressionGrid",
+    "chordInversionFilters",
+    "chordLibrarySummary",
+    "chordLibraryGrid",
+    "chordLibraryEmpty",
     "fretboard",
     "sessionInstrument",
     "sessionTuning",

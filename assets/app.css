@@ -116,6 +116,11 @@ body {
   width: min(100%, 36rem);
 }
 
+.session-strip--chords {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: min(100%, 38rem);
+}
+
 .session-strip > div {
   min-width: 0;
   padding: .75rem .85rem;
@@ -656,6 +661,7 @@ body {
   margin-top: .3rem;
   font-size: 2.6rem;
   line-height: 1;
+  overflow-wrap: anywhere;
 }
 
 .roman-badge {
@@ -708,6 +714,47 @@ body {
   line-height: 1.45;
 }
 
+.detail-list .tone-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .38rem .55rem;
+  line-height: 1.2;
+}
+
+.detail-list .tone-pair {
+  display: inline-flex;
+  align-items: center;
+  gap: .22rem;
+  color: var(--ink);
+  font-size: .98rem;
+  font-weight: 850;
+  text-transform: none;
+}
+
+.detail-list .tone-note {
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 900;
+  text-transform: none;
+}
+
+.detail-list .tone-role {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.38rem;
+  min-height: 1.18rem;
+  padding: 0 .28rem;
+  border: 1px solid #cfd7e3;
+  border-radius: 4px;
+  background: #f6f8fb;
+  color: #4a5564;
+  font-size: .68rem;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: none;
+}
+
 .detail-list-compact {
   gap: .55rem;
 }
@@ -715,6 +762,273 @@ body {
 .detail-list-compact > div {
   padding-bottom: 0;
   border-bottom: 0;
+}
+
+.empty-state {
+  padding: 1rem;
+  border: 1px dashed #cfd7e3;
+  border-radius: 8px;
+  color: var(--muted);
+  background: #f8fafc;
+  font-weight: 700;
+}
+
+.chord-inversion-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: 1rem;
+}
+
+.chord-inversion-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .55rem;
+  min-height: 2.35rem;
+  padding: .35rem .65rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font-size: .78rem;
+  font-weight: 850;
+}
+
+.chord-inversion-button:hover,
+.chord-inversion-button:focus {
+  border-color: #8c96a5;
+  background: #f7f9fb;
+}
+
+.chord-inversion-button.is-active {
+  border-color: var(--header);
+  background: var(--header);
+  color: #fff;
+}
+
+.chord-inversion-button strong {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.65rem;
+  min-height: 1.35rem;
+  padding: 0 .35rem;
+  border-radius: 999px;
+  background: #e9eef5;
+  color: #29313d;
+  font-size: .72rem;
+}
+
+.chord-inversion-button.is-active strong {
+  background: #f4c866;
+  color: #271d02;
+}
+
+.chord-library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr));
+  gap: .85rem;
+  align-items: start;
+}
+
+.chord-card {
+  min-width: 0;
+  padding: .8rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(32, 33, 36, .05);
+}
+
+.chord-card-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: .65rem;
+}
+
+.chord-card-heading strong,
+.chord-card-heading span {
+  display: block;
+}
+
+.chord-card-heading strong {
+  font-size: 1.05rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.chord-card-heading span {
+  margin-top: .2rem;
+  color: var(--muted);
+  font-size: .74rem;
+  font-weight: 800;
+}
+
+.shape-badge {
+  flex: 0 0 auto;
+  padding: .2rem .45rem;
+  border-radius: 4px;
+  background: #edf2f7;
+  color: #29313d;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .72rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.chord-diagram {
+  --fret-count: 4;
+  --string-label-width: 1.45rem;
+  --status-width: 1.8rem;
+  display: grid;
+  gap: .25rem;
+  margin: .85rem 0 .75rem;
+  overflow-x: auto;
+  padding-bottom: .15rem;
+}
+
+.chord-diagram-header,
+.chord-diagram-row {
+  display: grid;
+  grid-template-columns: var(--string-label-width) var(--status-width) repeat(var(--fret-count), minmax(2.25rem, 1fr));
+  gap: 0;
+  min-width: min-content;
+  align-items: center;
+}
+
+.chord-diagram-header span {
+  display: grid;
+  place-items: center;
+  min-height: 1.1rem;
+  color: var(--muted);
+  font-size: .7rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.chord-diagram-rows {
+  display: grid;
+  border-radius: 4px;
+}
+
+.diagram-string-label {
+  display: grid;
+  place-items: center;
+  min-height: 1.9rem;
+  color: #222831;
+  font-size: .72rem;
+  font-weight: 850;
+}
+
+.diagram-status-cell,
+.diagram-cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 1.9rem;
+}
+
+.diagram-status-cell {
+  background: #fff;
+}
+
+.diagram-cell {
+  position: relative;
+  overflow: hidden;
+  border-left: 2px solid #927f68;
+  background: #303030;
+}
+
+.diagram-cell.is-nut-adjacent {
+  border-left-width: .48rem;
+  border-left-color: #101113;
+}
+
+.diagram-status-cell::before,
+.diagram-cell::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  content: "";
+  background: var(--string);
+  transform: translateY(-50%);
+}
+
+.diagram-cell.has-marker::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: .42rem;
+  height: .42rem;
+  content: "";
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .8);
+  transform: translate(-50%, -50%);
+}
+
+.diagram-dot {
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 1.48rem;
+  height: 1.48rem;
+  border: 1px solid rgba(255, 255, 255, .82);
+  border-radius: 999px;
+  background: var(--arpeggio);
+  color: #fff;
+  font-size: .62rem;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 6px 12px rgba(23, 25, 28, .16);
+}
+
+.diagram-dot.root {
+  background: var(--target);
+  color: #1f1600;
+}
+
+.diagram-mute {
+  position: relative;
+  z-index: 1;
+  color: #b91c1c;
+  font-size: 1.15rem;
+  font-weight: 950;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.chord-card-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .45rem;
+  padding-top: .7rem;
+  border-top: 1px solid #e5e9ef;
+}
+
+.chord-card-meta div {
+  min-width: 0;
+}
+
+.chord-card-meta span {
+  display: block;
+  color: var(--muted);
+  font-size: .66rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.chord-card-meta strong {
+  display: block;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: .82rem;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media (min-width: 768px) {
@@ -750,6 +1064,17 @@ body {
   .control-field--bar,
   .control-field--position {
     grid-column: auto;
+  }
+
+  body[data-tool="chords"] .controls-grid {
+    grid-template-columns:
+      minmax(5.75rem, .75fr)
+      minmax(7.5rem, .9fr)
+      minmax(4.25rem, .5fr)
+      minmax(9rem, 1.2fr)
+      minmax(8.5rem, 1fr)
+      minmax(6rem, .65fr)
+      minmax(8.75rem, 1fr);
   }
 }
 

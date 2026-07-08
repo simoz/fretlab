@@ -8,9 +8,10 @@ The app is plain HTML, CSS, and JavaScript. There is no build step, package mana
 
 Open `index.html` in a browser.
 
-The top navigation links to the three current tools:
+The top navigation links to the four current tools:
 
 - `index.html` - scale layers on a fretboard
+- `chords.html` - chord library by instrument, tuning, root, type, fret range, position, and inversion
 - `progressions.html` - chord progressions, current-bar analysis, and chord-relative vocabulary
 - `triads.html` - compact triad maps by root and quality
 
@@ -83,6 +84,18 @@ Included triad qualities:
 
 Available layers are triad tones and root + fifth, with focus modes for all active layers, triad tones, or root + fifth.
 
+### Chords
+
+The chords page generates practical chord voicings for the selected instrument, tuning, root, chord type, fret range, and position. Voicings are grouped by the lowest sounding chord tone so root position and every available inversion can be selected directly.
+
+Included chord types:
+
+- Major, minor, power chord, diminished, augmented
+- Suspended 2 and suspended 4
+- Major 6 and minor 6
+- Major 7, dominant 7, minor 7, minor major 7, dominant 7sus4, half-diminished 7, diminished 7
+- Add 9, minor add 9, major 9, dominant 9, minor 9
+
 ## Instruments and Tunings
 
 Guitar tunings:
@@ -110,6 +123,7 @@ Bass tunings:
 - `index.html` - scales tool
 - `progressions.html` - progressions tool
 - `triads.html` - triads tool
+- `chords.html` - chord library tool
 - `assets/data.js` - notes, chords, scales, progressions, vocabulary, instruments, tunings, and fret positions
 - `assets/app.js` - shared rendering, state, controls, fretboard logic, tabs, and vocabulary behavior
 - `assets/app.css` - application styles

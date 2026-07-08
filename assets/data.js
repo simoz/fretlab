@@ -46,9 +46,17 @@ const CHORDS = {
   },
   m: {
     name: "minor triad",
+    suffix: "m",
     intervals: [0, 3, 7],
     roles: ["R", "b3", "5"],
     targets: [1]
+  },
+  "5": {
+    name: "power chord",
+    suffix: "5",
+    intervals: [0, 7],
+    roles: ["R", "5"],
+    targets: [0]
   },
   dim: {
     name: "diminished triad",
@@ -64,41 +72,117 @@ const CHORDS = {
     roles: ["R", "3", "#5"],
     targets: [1, 2]
   },
+  sus2: {
+    name: "suspended second",
+    suffix: "sus2",
+    intervals: [0, 2, 7],
+    roles: ["R", "2", "5"],
+    targets: [1]
+  },
   sus4: {
     name: "suspended fourth",
+    suffix: "sus4",
     intervals: [0, 5, 7],
     roles: ["R", "4", "5"],
     targets: [1]
   },
+  "6": {
+    name: "major sixth",
+    suffix: "6",
+    intervals: [0, 4, 7, 9],
+    roles: ["R", "3", "5", "6"],
+    targets: [1, 3]
+  },
+  m6: {
+    name: "minor sixth",
+    suffix: "m6",
+    intervals: [0, 3, 7, 9],
+    roles: ["R", "b3", "5", "6"],
+    targets: [1, 3]
+  },
   maj7: {
     name: "major seventh",
+    suffix: "maj7",
     intervals: [0, 4, 7, 11],
     roles: ["R", "3", "5", "7"],
     targets: [1, 3]
   },
   "7": {
     name: "dominant seventh",
+    suffix: "7",
     intervals: [0, 4, 7, 10],
     roles: ["R", "3", "5", "b7"],
     targets: [1, 3]
   },
   m7: {
     name: "minor seventh",
+    suffix: "m7",
     intervals: [0, 3, 7, 10],
     roles: ["R", "b3", "5", "b7"],
     targets: [1, 3]
   },
+  mMaj7: {
+    name: "minor major seventh",
+    suffix: "mMaj7",
+    intervals: [0, 3, 7, 11],
+    roles: ["R", "b3", "5", "7"],
+    targets: [1, 3]
+  },
+  "7sus4": {
+    name: "dominant suspended fourth",
+    suffix: "7sus4",
+    intervals: [0, 5, 7, 10],
+    roles: ["R", "4", "5", "b7"],
+    targets: [1, 3]
+  },
   m7b5: {
     name: "half-diminished seventh",
+    suffix: "m7b5",
     intervals: [0, 3, 6, 10],
     roles: ["R", "b3", "b5", "b7"],
     targets: [1, 3]
   },
   dim7: {
     name: "diminished seventh",
+    suffix: "dim7",
     intervals: [0, 3, 6, 9],
     roles: ["R", "b3", "b5", "bb7"],
     targets: [1, 3]
+  },
+  add9: {
+    name: "add ninth",
+    suffix: "add9",
+    intervals: [0, 4, 7, 14],
+    roles: ["R", "3", "5", "9"],
+    targets: [1, 3]
+  },
+  madd9: {
+    name: "minor add ninth",
+    suffix: "madd9",
+    intervals: [0, 3, 7, 14],
+    roles: ["R", "b3", "5", "9"],
+    targets: [1, 3]
+  },
+  maj9: {
+    name: "major ninth",
+    suffix: "maj9",
+    intervals: [0, 4, 7, 11, 14],
+    roles: ["R", "3", "5", "7", "9"],
+    targets: [1, 3, 4]
+  },
+  "9": {
+    name: "dominant ninth",
+    suffix: "9",
+    intervals: [0, 4, 7, 10, 14],
+    roles: ["R", "3", "5", "b7", "9"],
+    targets: [1, 3, 4]
+  },
+  m9: {
+    name: "minor ninth",
+    suffix: "m9",
+    intervals: [0, 3, 7, 10, 14],
+    roles: ["R", "b3", "5", "b7", "9"],
+    targets: [1, 3, 4]
   }
 };
 
@@ -107,6 +191,30 @@ const TRIAD_QUALITY_OPTIONS = [
   { value: "m", label: "Minor" },
   { value: "dim", label: "Diminished" },
   { value: "aug", label: "Augmented" }
+];
+
+const CHORD_LIBRARY_OPTIONS = [
+  { value: "maj", label: "Major" },
+  { value: "m", label: "Minor" },
+  { value: "5", label: "Power chord" },
+  { value: "dim", label: "Diminished" },
+  { value: "aug", label: "Augmented" },
+  { value: "sus2", label: "Suspended 2" },
+  { value: "sus4", label: "Suspended 4" },
+  { value: "6", label: "Major 6" },
+  { value: "m6", label: "Minor 6" },
+  { value: "maj7", label: "Major 7" },
+  { value: "7", label: "Dominant 7" },
+  { value: "m7", label: "Minor 7" },
+  { value: "mMaj7", label: "Minor major 7" },
+  { value: "7sus4", label: "Dominant 7sus4" },
+  { value: "m7b5", label: "Half-diminished 7" },
+  { value: "dim7", label: "Diminished 7" },
+  { value: "add9", label: "Add 9" },
+  { value: "madd9", label: "Minor add 9" },
+  { value: "maj9", label: "Major 9" },
+  { value: "9", label: "Dominant 9" },
+  { value: "m9", label: "Minor 9" }
 ];
 
 const SCALES = {
@@ -923,6 +1031,7 @@ window.FretLabData = {
   DEGREE_INTERVALS,
   CHORDS,
   TRIAD_QUALITY_OPTIONS,
+  CHORD_LIBRARY_OPTIONS,
   SCALES,
   PROGRESSIONS,
   VOCABULARY,
