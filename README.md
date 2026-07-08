@@ -36,7 +36,7 @@ Then open `http://localhost:8000/`.
 
 ### Scales
 
-The scales page lets you combine multiple key-relative scale layers on the same fretboard. The default view highlights major blues and minor blues, and an active scale palette shows the notes and interval roles for selected layers.
+The scales page lets you combine multiple key-relative scale layers on the same fretboard. The default view highlights minor blues, and an active scale palette shows the notes and interval roles for selected layers.
 
 Included scale families:
 

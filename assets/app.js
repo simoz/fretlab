@@ -20,7 +20,6 @@ const {
 const STORAGE_KEY = "fretlab-state-v1";
 const SCALE_KEYS = Object.keys(SCALES);
 const DEFAULT_SCALE_LAYERS = {
-  majorBlues: true,
   minorBlues: true
 };
 const SCALE_COLORS = [
