@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FretLab - Scales</title>
+    <link href="assets/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/app.css" rel="stylesheet">
+  </head>
+  <body data-tool="scales">
+    <main class="app-shell">
+      <header class="app-header">
+        <div class="container-fluid px-3 px-lg-4">
+          <div class="d-flex flex-column flex-lg-row align-items-lg-end justify-content-between gap-3">
+            <div>
+              <h1 class="app-title mb-2"><span class="title-accent">Fret</span>Lab</h1>
+              <p class="app-subtitle mb-3">Scales on one playable map.</p>
+              <nav class="tool-nav" aria-label="FretLab tools">
+                <a class="tool-nav-link is-active" href="index.html">Scales</a>
+                <a class="tool-nav-link" href="progressions.html">Progressions</a>
+                <a class="tool-nav-link" href="triads.html">Triads</a>
+              </nav>
+            </div>
+            <div class="session-strip session-strip--compact" aria-label="Current session">
+              <div>
+                <span class="session-label">Instrument</span>
+                <strong id="sessionInstrument">Guitar</strong>
+              </div>
+              <div>
+                <span class="session-label">Tuning</span>
+                <strong id="sessionTuning">Standard</strong>
+              </div>
+              <div>
+                <span class="session-label">Key</span>
+                <strong id="sessionKey">C</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="control-bar">
+        <div class="container-fluid px-3 px-lg-4">
+          <div class="controls-grid">
+            <div class="control-field">
+              <label for="instrumentSelect" class="form-label">Instrument</label>
+              <select id="instrumentSelect" class="form-select"></select>
+            </div>
+            <div class="control-field">
+              <label for="tuningSelect" class="form-label">Tuning</label>
+              <select id="tuningSelect" class="form-select"></select>
+            </div>
+            <div class="control-field">
+              <label for="keySelect" class="form-label">Key</label>
+              <select id="keySelect" class="form-select"></select>
+            </div>
+            <div class="control-field">
+              <label for="labelMode" class="form-label">Labels</label>
+              <select id="labelMode" class="form-select">
+                <option value="notes">Notes</option>
+                <option value="intervals">Intervals</option>
+              </select>
+            </div>
+            <div class="control-field">
+              <label for="fretCount" class="form-label">Frets</label>
+              <select id="fretCount" class="form-select">
+                <option value="12">0-12</option>
+                <option value="15">0-15</option>
+                <option value="17">0-17</option>
+                <option value="20">0-20</option>
+                <option value="24">0-24</option>
+              </select>
+            </div>
+            <div class="control-field control-field--position">
+              <label for="positionSelect" class="form-label">Position</label>
+              <select id="positionSelect" class="form-select"></select>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="container-fluid px-3 px-lg-4 py-4">
+        <div class="row g-4">
+          <div class="col-12 col-xl-8">
+            <section class="panel" aria-labelledby="fretboardTitle">
+              <div class="panel-heading">
+                <div>
+                  <h2 id="fretboardTitle" class="panel-title">Fretboard</h2>
+                  <p id="fretboardSummary" class="panel-copy mb-0">Standard tuning, high E on top.</p>
+                </div>
+              </div>
+              <div class="fretboard-scroll" tabindex="0">
+                <div id="fretboard" class="fretboard"></div>
+              </div>
+            </section>
+
+            <section id="scalePalettePanel" class="panel mt-4" aria-labelledby="scaleTitle" hidden>
+              <div class="panel-heading">
+                <div>
+                  <h2 id="scaleTitle" class="panel-title">Scale palette</h2>
+                </div>
+              </div>
+              <div id="scalePaletteList" class="detail-list"></div>
+            </section>
+          </div>
+
+          <div class="col-12 col-xl-4">
+            <section class="panel" aria-labelledby="layersTitle">
+              <div class="panel-heading">
+                <div>
+                  <h2 id="layersTitle" class="panel-title">Scale layers</h2>
+                </div>
+              </div>
+              <div id="scaleLayerGrid" class="layer-grid"></div>
+            </section>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="assets/data.js" defer></script>
+    <script src="assets/app.js" defer></script>
+  </body>
+</html>
