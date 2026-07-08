@@ -4,6 +4,8 @@ FretLab is a standalone browser prototype for exploring guitar and bass fretboar
 
 The app is plain HTML, CSS, and JavaScript. There is no build step, package manager, backend, or remote runtime dependency. Bootstrap is vendored locally in `assets/bootstrap.min.css`; app data lives in `assets/data.js`, and the shared interaction logic lives in `assets/app.js`.
 
+Live page: [https://simoz.github.io/fretlab/](https://simoz.github.io/fretlab/).
+
 ## Use
 
 Open `index.html` in a browser.
