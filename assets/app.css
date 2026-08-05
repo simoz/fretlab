@@ -34,7 +34,28 @@ body {
 }
 
 .app-shell {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
+}
+
+.app-footer {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: auto;
+  padding: .75rem 1rem;
+  color: var(--muted);
+  font-size: .78rem;
+}
+
+.app-footer a {
+  color: inherit;
+}
+
+.app-footer a:hover,
+.app-footer a:focus {
+  color: var(--ink);
 }
 
 .app-header {
