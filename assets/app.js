@@ -19,7 +19,7 @@ const {
 } = window.FretLabData;
 
 const STORAGE_KEY = "fretlab-state-v1";
-const STORAGE_SCHEMA_VERSION = 2;
+const STORAGE_SCHEMA_VERSION = 3;
 const SCALE_KEYS = Object.keys(SCALES);
 const INVERSION_ALL = "all";
 const CHORD_LIBRARY_MAX_PER_INVERSION = 12;
@@ -83,6 +83,12 @@ const state = {
   triadQuality: "maj",
   chordQuality: "maj",
   chordInversion: INVERSION_ALL,
+  triadStudyMode: "map",
+  triadStringGroup: "1-3",
+  triadInversion: 0,
+  triadTrainerLabels: "intervals",
+  triadShapeIndex: 0,
+  triadExerciseRevealed: false,
   layers: {
     ...Object.fromEntries(SCALE_KEYS.map((scaleKey) => [scaleKey, Boolean(DEFAULT_SCALE_LAYERS[scaleKey])])),
     arpeggio: true,
@@ -286,6 +292,81 @@ function triadForSelection() {
     functionName: chord.name,
     tones,
     targets: tones.filter((tone) => tone.target)
+  };
+}
+
+function triadStringGroups() {
+  const stringCount = currentTuning().tuning.length;
+  return Array.from({ length: Math.max(0, stringCount - 2) }, (_, index) => ({
+    value: `${index + 1}-${index + 3}`,
+    label: `Strings ${index + 1}-${index + 3}`,
+    startIndex: index
+  }));
+}
+
+function currentTriadStringGroup() {
+  const groups = triadStringGroups();
+  return groups.find((group) => group.value === state.triadStringGroup) || groups[0];
+}
+
+function triadShapes(chord = triadForSelection()) {
+  const group = currentTriadStringGroup();
+  if (!group) return [];
+
+  const range = visibleFretRange();
+  const strings = currentTuning().tuning.slice(group.startIndex, group.startIndex + 3);
+  const candidates = strings.map((string) => {
+    const matches = [];
+    for (let fret = range.start; fret <= range.end; fret += 1) {
+      const tone = chordToneForPc(chord, pc(string.pc + fret));
+      if (tone) matches.push({ fret, pc: tone.pc, role: tone.role });
+    }
+    return matches;
+  });
+  const shapes = [];
+
+  candidates[0].forEach((first) => {
+    candidates[1].forEach((second) => {
+      candidates[2].forEach((third) => {
+        const notes = [first, second, third];
+        const frets = notes.map((note) => note.fret);
+        const roles = new Set(notes.map((note) => note.role));
+        if (roles.size !== 3 || Math.max(...frets) - Math.min(...frets) > 4) return;
+        if (third.role !== chord.tones[state.triadInversion]?.role) return;
+        shapes.push({ notes, startIndex: group.startIndex });
+      });
+    });
+  });
+
+  return shapes.sort((a, b) => {
+    const aPosition = Math.max(...a.notes.map((note) => note.fret));
+    const bPosition = Math.max(...b.notes.map((note) => note.fret));
+    return aPosition - bPosition;
+  });
+}
+
+function currentTriadShape() {
+  const shapes = triadShapes();
+  if (!shapes.length) return null;
+  state.triadShapeIndex = ((state.triadShapeIndex % shapes.length) + shapes.length) % shapes.length;
+  return shapes[state.triadShapeIndex];
+}
+
+function triadTrainerCellInfo(info, stringIndex, fret) {
+  if (currentTool() !== "triads" || state.triadStudyMode === "map") return info;
+  if (state.triadStudyMode === "quiz" && !state.triadExerciseRevealed) return null;
+  if (!info) return null;
+
+  const shape = currentTriadShape();
+  if (!shape) return null;
+  const shapeOffset = stringIndex - shape.startIndex;
+  if (shapeOffset < 0 || shapeOffset >= shape.notes.length || shape.notes[shapeOffset].fret !== fret) return null;
+
+  if (state.triadTrainerLabels === "hidden") return { ...info, label: "" };
+  const tone = shape.notes[shapeOffset];
+  return {
+    ...info,
+    label: state.triadTrainerLabels === "intervals" ? tone.role : noteNameForRole(tone.pc, tone.role)
   };
 }
 
@@ -896,25 +977,25 @@ function renderFretboard() {
     els.fretboard.append(label);
   }
 
-  tuning.tuning.forEach((string) => {
+  tuning.tuning.forEach((string, stringIndex) => {
     const stringLabel = document.createElement("div");
     stringLabel.className = "string-label";
     stringLabel.textContent = string.label;
     els.fretboard.append(stringLabel);
 
     if (hasOpenStrings) {
-      els.fretboard.append(renderFretCell(string, 0, chord, true, false));
+      els.fretboard.append(renderFretCell(string, 0, chord, true, false, stringIndex));
     }
 
     for (let fret = firstFretted; fret <= fretRange.end; fret += 1) {
-      els.fretboard.append(renderFretCell(string, fret, chord, false, hasOpenStrings && fret === firstFretted));
+      els.fretboard.append(renderFretCell(string, fret, chord, false, hasOpenStrings && fret === firstFretted, stringIndex));
     }
   });
 }
 
-function renderFretCell(string, fret, chord, isOpenString, isNutAdjacent) {
+function renderFretCell(string, fret, chord, isOpenString, isNutAdjacent, stringIndex) {
   const notePc = pc(string.pc + fret);
-  const info = noteInfo(notePc, chord);
+  const info = triadTrainerCellInfo(noteInfo(notePc, chord), stringIndex, fret);
   const cell = document.createElement("div");
   const markerClass = !isOpenString && FRET_MARKERS.has(fret) ? ` has-marker fret-marker-${fret}` : "";
   cell.className = `fret-cell${isOpenString ? " is-open-string" : ""}${isNutAdjacent ? " is-nut-adjacent" : ""}${markerClass}`;
@@ -1197,7 +1278,36 @@ function render() {
   renderDetails();
   renderVocabulary();
   renderChordLibrary();
+  renderTriadTrainer();
   syncControls();
+}
+
+function renderTriadTrainer() {
+  if (!els.triadStudyMode) return;
+
+  const shapes = triadShapes();
+  const shapeNumber = shapes.length ? state.triadShapeIndex + 1 : 0;
+  const group = currentTriadStringGroup();
+  const inversion = ["root position", "1st inversion", "2nd inversion"][state.triadInversion];
+  const isMap = state.triadStudyMode === "map";
+  const isQuiz = state.triadStudyMode === "quiz";
+
+  setText("triadShapeCount", isMap ? "Map" : `${shapeNumber} / ${shapes.length}`);
+  setText("triadTrainerPrompt", isQuiz
+    ? `Find ${currentChord().name}, ${inversion}, on ${group?.label.toLowerCase() || "the selected strings"}.`
+    : isMap
+      ? "All triad tones are visible across the selected fret range."
+      : shapes.length
+        ? `${currentChord().name}, ${inversion}, ${group.label.toLowerCase()}. Move through the compact shapes along the neck.`
+        : "No compact shape is available in the selected fret range.");
+
+  els.previousTriadShape.hidden = isMap || isQuiz;
+  els.nextTriadShape.hidden = isMap || isQuiz;
+  els.revealTriadShape.hidden = !isQuiz;
+  els.newTriadExercise.hidden = !isQuiz;
+  els.revealTriadShape.textContent = state.triadExerciseRevealed ? "Hide solution" : "Show solution";
+  els.previousTriadShape.disabled = shapes.length < 2;
+  els.nextTriadShape.disabled = shapes.length < 2;
 }
 
 function renderVocabulary() {
@@ -1237,6 +1347,10 @@ function syncControls() {
   if (els.fretCount) els.fretCount.value = String(state.fretCount);
   if (els.positionSelect) els.positionSelect.value = state.position;
   if (els.focusMode) els.focusMode.value = currentFocusMode();
+  if (els.triadStudyMode) els.triadStudyMode.value = state.triadStudyMode;
+  if (els.triadStringGroup) els.triadStringGroup.value = currentTriadStringGroup()?.value || "";
+  if (els.triadInversion) els.triadInversion.value = String(state.triadInversion);
+  if (els.triadTrainerLabels) els.triadTrainerLabels.value = state.triadTrainerLabels;
   document.querySelectorAll(".layer-toggle").forEach((input) => {
     input.checked = state.layers[input.dataset.layer];
     input.disabled = !isLayerAllowed(input.dataset.layer);
@@ -1273,6 +1387,11 @@ function loadState() {
     state.triadQuality = CHORDS[saved.triadQuality] ? saved.triadQuality : state.triadQuality;
     state.chordQuality = CHORDS[saved.chordQuality] ? saved.chordQuality : state.chordQuality;
     state.chordInversion = saved.chordInversion === INVERSION_ALL || /^inv-\d+$/.test(saved.chordInversion || "") ? saved.chordInversion : state.chordInversion;
+    state.triadStudyMode = ["map", "shape", "quiz"].includes(saved.triadStudyMode) ? saved.triadStudyMode : state.triadStudyMode;
+    state.triadStringGroup = typeof saved.triadStringGroup === "string" ? saved.triadStringGroup : state.triadStringGroup;
+    state.triadInversion = [0, 1, 2].includes(saved.triadInversion) ? saved.triadInversion : state.triadInversion;
+    state.triadTrainerLabels = ["notes", "intervals", "hidden"].includes(saved.triadTrainerLabels) ? saved.triadTrainerLabels : state.triadTrainerLabels;
+    state.triadShapeIndex = Number.isInteger(saved.triadShapeIndex) ? saved.triadShapeIndex : state.triadShapeIndex;
     state.layers = { ...state.layers, ...saved.layers };
     if (savedVersion < STORAGE_SCHEMA_VERSION) {
       state.layers.majorBlues = Boolean(DEFAULT_SCALE_LAYERS.majorBlues);
@@ -1303,6 +1422,7 @@ function populateControls() {
   }
 
   populateTuningOptions();
+  populateTriadStringGroups();
 
   if (els.keySelect) {
     KEY_OPTIONS.forEach((key, index) => {
@@ -1360,6 +1480,19 @@ function populateControls() {
       els.vocabularyGrid.append(checkbox, label);
     });
   }
+}
+
+function populateTriadStringGroups() {
+  if (!els.triadStringGroup) return;
+
+  els.triadStringGroup.innerHTML = "";
+  triadStringGroups().forEach((group) => {
+    const option = document.createElement("option");
+    option.value = group.value;
+    option.textContent = group.label;
+    els.triadStringGroup.append(option);
+  });
+  state.triadStringGroup = currentTriadStringGroup()?.value || "";
 }
 
 function populateScaleControls() {
@@ -1459,6 +1592,7 @@ function bindEvents() {
     state.instrument = event.target.value;
     if (!currentTuningOptions()[state.tuning]) state.tuning = currentInstrument().defaultTuning;
     populateTuningOptions();
+    populateTriadStringGroups();
     saveState();
     render();
   });
@@ -1513,6 +1647,8 @@ function bindEvents() {
 
   bindIfPresent(els.triadQualitySelect, "change", (event) => {
     state.triadQuality = event.target.value;
+    state.triadShapeIndex = 0;
+    state.triadExerciseRevealed = false;
     saveState();
     render();
   });
@@ -1548,6 +1684,68 @@ function bindEvents() {
 
   bindIfPresent(els.focusMode, "change", (event) => {
     state.focusMode = event.target.value;
+    saveState();
+    render();
+  });
+
+  bindIfPresent(els.triadStudyMode, "change", (event) => {
+    state.triadStudyMode = event.target.value;
+    state.triadShapeIndex = 0;
+    state.triadExerciseRevealed = false;
+    saveState();
+    render();
+  });
+
+  bindIfPresent(els.triadStringGroup, "change", (event) => {
+    state.triadStringGroup = event.target.value;
+    state.triadShapeIndex = 0;
+    state.triadExerciseRevealed = false;
+    saveState();
+    render();
+  });
+
+  bindIfPresent(els.triadInversion, "change", (event) => {
+    state.triadInversion = Number(event.target.value);
+    state.triadShapeIndex = 0;
+    state.triadExerciseRevealed = false;
+    saveState();
+    render();
+  });
+
+  bindIfPresent(els.triadTrainerLabels, "change", (event) => {
+    state.triadTrainerLabels = event.target.value;
+    saveState();
+    render();
+  });
+
+  bindIfPresent(els.previousTriadShape, "click", () => {
+    state.triadShapeIndex -= 1;
+    saveState();
+    render();
+  });
+
+  bindIfPresent(els.nextTriadShape, "click", () => {
+    state.triadShapeIndex += 1;
+    saveState();
+    render();
+  });
+
+  bindIfPresent(els.revealTriadShape, "click", () => {
+    state.triadExerciseRevealed = !state.triadExerciseRevealed;
+    render();
+  });
+
+  bindIfPresent(els.newTriadExercise, "click", () => {
+    const groups = triadStringGroups();
+    for (let attempt = 0; attempt < 50; attempt += 1) {
+      state.keyIndex = Math.floor(Math.random() * KEY_OPTIONS.length);
+      state.triadQuality = TRIAD_QUALITY_OPTIONS[Math.floor(Math.random() * TRIAD_QUALITY_OPTIONS.length)].value;
+      state.triadStringGroup = groups[Math.floor(Math.random() * groups.length)].value;
+      state.triadInversion = Math.floor(Math.random() * 3);
+      if (triadShapes().length) break;
+    }
+    state.triadShapeIndex = 0;
+    state.triadExerciseRevealed = false;
     saveState();
     render();
   });
@@ -1600,6 +1798,16 @@ function cacheElements() {
     "fretCount",
     "positionSelect",
     "focusMode",
+    "triadStudyMode",
+    "triadStringGroup",
+    "triadInversion",
+    "triadTrainerLabels",
+    "triadTrainerPrompt",
+    "triadShapeCount",
+    "previousTriadShape",
+    "nextTriadShape",
+    "revealTriadShape",
+    "newTriadExercise",
     "applySuggestions",
     "clearVocabulary",
     "progressionSummary",

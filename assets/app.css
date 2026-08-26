@@ -649,6 +649,26 @@ body {
   gap: .5rem;
 }
 
+.triad-trainer-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .75rem;
+}
+
+.triad-trainer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.note-marker.triad:empty::after {
+  content: "";
+  width: .42rem;
+  height: .42rem;
+  border-radius: 999px;
+  background: currentColor;
+}
+
 .vocabulary-grid .layer-button {
   position: relative;
 }
@@ -1233,6 +1253,10 @@ body {
 
   .metronome-actions {
     grid-template-columns: 1fr;
+  }
+
+  .triad-trainer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

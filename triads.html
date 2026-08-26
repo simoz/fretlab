@@ -103,6 +103,54 @@
                 <div id="fretboard" class="fretboard"></div>
               </div>
             </section>
+
+            <section class="panel mt-4" aria-labelledby="triadTrainerTitle">
+              <div class="panel-heading">
+                <div>
+                  <h2 id="triadTrainerTitle" class="panel-title">Triad trainer</h2>
+                  <p id="triadTrainerPrompt" class="panel-copy mb-0">Choose a study mode to isolate compact triad shapes.</p>
+                </div>
+                <span id="triadShapeCount" class="roman-badge">Map</span>
+              </div>
+
+              <div class="triad-trainer-grid">
+                <div class="control-field">
+                  <label for="triadStudyMode" class="form-label">Study mode</label>
+                  <select id="triadStudyMode" class="form-select">
+                    <option value="map">Full map</option>
+                    <option value="shape">One shape</option>
+                    <option value="quiz">Quiz</option>
+                  </select>
+                </div>
+                <div class="control-field">
+                  <label for="triadStringGroup" class="form-label">String group</label>
+                  <select id="triadStringGroup" class="form-select"></select>
+                </div>
+                <div class="control-field">
+                  <label for="triadInversion" class="form-label">Inversion</label>
+                  <select id="triadInversion" class="form-select">
+                    <option value="0">Root position</option>
+                    <option value="1">1st inversion</option>
+                    <option value="2">2nd inversion</option>
+                  </select>
+                </div>
+                <div class="control-field">
+                  <label for="triadTrainerLabels" class="form-label">Shape labels</label>
+                  <select id="triadTrainerLabels" class="form-select">
+                    <option value="notes">Notes</option>
+                    <option value="intervals">Intervals</option>
+                    <option value="hidden">Hidden</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="triad-trainer-actions mt-3">
+                <button id="previousTriadShape" class="btn btn-outline-secondary" type="button">Previous shape</button>
+                <button id="nextTriadShape" class="btn btn-outline-secondary" type="button">Next shape</button>
+                <button id="revealTriadShape" class="btn btn-dark" type="button">Show solution</button>
+                <button id="newTriadExercise" class="btn btn-outline-dark" type="button">New exercise</button>
+              </div>
+            </section>
           </div>
 
           <div class="col-12 col-xl-4">
