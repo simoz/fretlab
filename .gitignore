@@ -1,0 +1,5 @@
+# Ignore codex.app agents
+AGENTS.md
+
+# Ignore generated Graphify artifacts
+graphify-out/
