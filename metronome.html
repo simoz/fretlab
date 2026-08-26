@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FretLab - Metronome</title>
+    <link href="assets/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/app.css" rel="stylesheet">
+  </head>
+  <body data-tool="metronome">
+    <main class="app-shell">
+      <header class="app-header">
+        <div class="container-fluid px-3 px-lg-4">
+          <div>
+            <h1 class="app-title mb-2"><span class="title-accent">Fret</span>Lab</h1>
+            <p class="app-subtitle mb-3">A focused practice pulse with visual beats and tap tempo.</p>
+            <nav class="tool-nav" aria-label="FretLab tools">
+              <a class="tool-nav-link" href="index.html">Scales</a>
+              <a class="tool-nav-link" href="chords.html">Chords</a>
+              <a class="tool-nav-link" href="progressions.html">Progressions</a>
+              <a class="tool-nav-link" href="triads.html">Triads</a>
+              <a class="tool-nav-link is-active" href="metronome.html">Metronome</a>
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      <section class="container-fluid px-3 px-lg-4 py-4">
+        <section class="panel metronome-panel" aria-labelledby="metronomeTitle">
+          <div class="panel-heading">
+            <div>
+              <h2 id="metronomeTitle" class="panel-title">Metronome</h2>
+              <p class="panel-copy mb-0">Press Space to start or stop. Use the arrow keys to adjust the tempo.</p>
+            </div>
+          </div>
+
+          <div class="metronome-display" aria-live="polite">
+            <output id="bpmValue" for="bpmRange bpmInput">100</output>
+            <span>BPM</span>
+          </div>
+
+          <div id="beatIndicators" class="beat-indicators" aria-label="Beat 1 of 4"></div>
+
+          <div class="metronome-controls">
+            <button id="decreaseBpm" class="btn btn-outline-secondary tempo-step" type="button" aria-label="Decrease tempo">−</button>
+            <input id="bpmRange" class="form-range" type="range" min="30" max="300" value="100" aria-label="Tempo in beats per minute">
+            <button id="increaseBpm" class="btn btn-outline-secondary tempo-step" type="button" aria-label="Increase tempo">+</button>
+          </div>
+
+          <div class="metronome-settings">
+            <div class="control-field">
+              <label for="bpmInput" class="form-label">Tempo</label>
+              <div class="input-group">
+                <input id="bpmInput" class="form-control" type="number" min="30" max="300" value="100" inputmode="numeric">
+                <span class="input-group-text">BPM</span>
+              </div>
+            </div>
+            <div class="control-field">
+              <label for="beatsPerBar" class="form-label">Beats per bar</label>
+              <select id="beatsPerBar" class="form-select">
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4" selected>4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+              </select>
+            </div>
+            <div class="control-field metronome-accent-field">
+              <span class="form-label">Sound</span>
+              <div class="form-check form-switch">
+                <input id="accentFirstBeat" class="form-check-input" type="checkbox" role="switch" checked>
+                <label class="form-check-label" for="accentFirstBeat">Accent first beat</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="metronome-actions">
+            <button id="toggleMetronome" class="btn btn-dark metronome-start" type="button" aria-pressed="false">Start</button>
+            <button id="tapTempo" class="btn btn-outline-dark" type="button">Tap tempo</button>
+          </div>
+          <p id="metronomeStatus" class="visually-hidden" role="status">Metronome stopped</p>
+        </section>
+      </section>
+
+      <footer class="app-footer">
+        <a href="https://github.com/simoz/fretlab">GitHub</a>
+        <a href="https://github.com/simoz/fretlab/archive/refs/heads/main.zip" download>Download</a>
+      </footer>
+    </main>
+
+    <script src="assets/metronome.js" defer></script>
+  </body>
+</html>

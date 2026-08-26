@@ -10,12 +10,13 @@ Live page: [https://simoz.github.io/fretlab/](https://simoz.github.io/fretlab/).
 
 Open `index.html` in a browser.
 
-The top navigation links to the four current tools:
+The top navigation links to the five current tools:
 
 - `index.html` - scale layers on a fretboard
 - `chords.html` - chord library by instrument, tuning, root, type, fret range, position, and inversion
 - `progressions.html` - chord progressions, current-bar analysis, and chord-relative vocabulary
 - `triads.html` - compact triad maps by root and quality
+- `metronome.html` - adjustable practice pulse with tap tempo and visual beats
 
 If a local server is preferred:
 
@@ -34,6 +35,7 @@ Then open `http://localhost:8000/`.
 - Position filters: full range, open position, low box, middle box, upper box, octave box, and high range.
 - Browser-local state persistence through `localStorage`.
 - Local Bootstrap-based controls with custom fretboard styling.
+- Metronome with 30-300 BPM range, tap tempo, configurable beats per bar, and first-beat accent.
 
 ## Tools
 
@@ -98,6 +100,10 @@ Included chord types:
 - Major 7, dominant 7, minor 7, minor major 7, dominant 7sus4, half-diminished 7, diminished 7
 - Add 9, minor add 9, major 9, dominant 9, minor 9
 
+### Metronome
+
+The metronome provides an accurate Web Audio pulse, visual beat indicators, optional first-beat accent, two to seven beats per bar, tap tempo, and keyboard controls. Press Space to start or stop and use the arrow keys to adjust the tempo.
+
 ## Instruments and Tunings
 
 Guitar tunings:
@@ -126,8 +132,10 @@ Bass tunings:
 - `progressions.html` - progressions tool
 - `triads.html` - triads tool
 - `chords.html` - chord library tool
+- `metronome.html` - metronome tool
 - `assets/data.js` - notes, chords, scales, progressions, vocabulary, instruments, tunings, and fret positions
 - `assets/app.js` - shared rendering, state, controls, fretboard logic, tabs, and vocabulary behavior
+- `assets/metronome.js` - metronome timing, audio, controls, and persistence
 - `assets/app.css` - application styles
 - `assets/bootstrap.min.css` - vendored Bootstrap CSS
 
