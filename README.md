@@ -77,7 +77,7 @@ Suggested vocabulary includes the current triad, major/minor/diminished/augmente
 
 ### Triads
 
-The triads page maps a selected root and triad quality across the fretboard. Its trainer can isolate compact shapes by string group and inversion, hide their labels, or generate random exercises with a concealed solution.
+The triads page maps a selected root and triad quality across the fretboard, with an optional filter for three-string groups. Its trainer can isolate compact shapes by string group and inversion, hide their labels, or generate random exercises with a concealed solution.
 
 Included triad qualities:
 
