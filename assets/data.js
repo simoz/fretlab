@@ -940,9 +940,19 @@ const TUNINGS = {
   },
   bass: {
     standard: {
-      label: "Standard",
+      label: "Standard (4-string)",
       summary: "4-string standard tuning, G on top.",
       tuning: notes("G", "D", "A", "E")
+    },
+    standard5: {
+      label: "Standard (5-string)",
+      summary: "5-string standard tuning, G on top.",
+      tuning: notes("G", "D", "A", "E", "B")
+    },
+    standard6: {
+      label: "Standard (6-string)",
+      summary: "6-string standard tuning, high C on top.",
+      tuning: notes("C", "G", "D", "A", "E", "B")
     },
     dropD: {
       label: "Drop D",

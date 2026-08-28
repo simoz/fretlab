@@ -120,7 +120,9 @@ Guitar tunings:
 
 Bass tunings:
 
-- Standard
+- Standard (4-string)
+- Standard (5-string, BEADG)
+- Standard (6-string, BEADGC)
 - Drop D
 - BEAD
 - Tenor
