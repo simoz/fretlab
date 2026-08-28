@@ -75,13 +75,17 @@
       oscillators.clear();
     }
 
-    function stop() {
-      playbackToken += 1;
-      playing = false;
+    function clearCompletionTimer() {
       if (completionTimer !== null) {
         global.clearTimeout(completionTimer);
         completionTimer = null;
       }
+    }
+
+    function stop() {
+      playbackToken += 1;
+      playing = false;
+      clearCompletionTimer();
       eventTimers.forEach(clearTimer);
       eventTimers.clear();
       stopOscillators();
@@ -131,33 +135,64 @@
               eventTimers.delete(timer);
               if (token !== playbackToken) return;
               if (typeof onEvent === "function") onEvent(event);
-              const oscillator = context.createOscillator();
-              const gain = context.createGain();
-              const startTime = Math.max(baseTime + event.start, Number(context.currentTime) || baseTime);
-              const endTime = startTime + event.duration;
-              const attack = Math.min(0.015, event.duration / 4);
-              const release = Math.min(0.08, event.duration / 3);
-              const peak = Math.max(0.0001, event.velocity * 0.22);
-              oscillator.type = "triangle";
-              oscillator.frequency.setValueAtTime(midiToFrequency(event.midi), startTime);
-              gain.gain.setValueAtTime(0.0001, startTime);
-              gain.gain.linearRampToValueAtTime(peak, startTime + attack);
-              gain.gain.setValueAtTime(peak, Math.max(startTime + attack, endTime - release));
-              gain.gain.linearRampToValueAtTime(0.0001, endTime);
-              oscillator.connect(gain);
-              gain.connect(context.destination);
-              oscillators.add(oscillator);
-              oscillator.onended = () => {
-                oscillators.delete(oscillator);
-                try {
-                  oscillator.disconnect();
-                  gain.disconnect();
-                } catch (_error) {
-                  // Cleanup is best effort.
+              let oscillator = null;
+              let gain = null;
+              try {
+                oscillator = context.createOscillator();
+                gain = context.createGain();
+                const startTime = Math.max(baseTime + event.start, Number(context.currentTime) || baseTime);
+                const endTime = startTime + event.duration;
+                const attack = Math.min(0.015, event.duration / 4);
+                const release = Math.min(0.08, event.duration / 3);
+                const peak = Math.max(0.0001, event.velocity * 0.22);
+                oscillator.type = "triangle";
+                oscillator.frequency.setValueAtTime(midiToFrequency(event.midi), startTime);
+                gain.gain.setValueAtTime(0.0001, startTime);
+                gain.gain.linearRampToValueAtTime(peak, startTime + attack);
+                gain.gain.setValueAtTime(peak, Math.max(startTime + attack, endTime - release));
+                gain.gain.linearRampToValueAtTime(0.0001, endTime);
+                oscillator.connect(gain);
+                gain.connect(context.destination);
+                oscillators.add(oscillator);
+                oscillator.onended = () => {
+                  oscillators.delete(oscillator);
+                  try {
+                    oscillator.disconnect();
+                    gain.disconnect();
+                  } catch (_error) {
+                    // Cleanup is best effort.
+                  }
+                };
+                oscillator.start(startTime);
+                oscillator.stop(endTime);
+              } catch (error) {
+                if (oscillator !== null && !oscillators.has(oscillator)) {
+                  try {
+                    oscillator.stop();
+                  } catch (_error) {
+                    // An oscillator may not have started.
+                  }
+                  try {
+                    oscillator.disconnect();
+                  } catch (_error) {
+                    // Cleanup is best effort.
+                  }
                 }
-              };
-              oscillator.start(startTime);
-              oscillator.stop(endTime);
+                if (gain !== null) {
+                  try {
+                    gain.disconnect();
+                  } catch (_error) {
+                    // Cleanup is best effort.
+                  }
+                }
+                playbackToken += 1;
+                playing = false;
+                clearCompletionTimer();
+                eventTimers.forEach(clearTimer);
+                eventTimers.clear();
+                stopOscillators();
+                if (typeof onError === "function") onError(error);
+              }
             }, delay);
             eventTimers.add(timer);
           });
