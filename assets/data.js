@@ -903,143 +903,170 @@ const TUNINGS = {
     standard: {
       label: "Standard",
       summary: "Standard tuning, high E on top.",
-      tuning: notes("E", "B", "G", "D", "A", "E")
+      tuning: notes("E", "B", "G", "D", "A", "E"),
+      openMidi: [64, 59, 55, 50, 45, 40]
     },
     dropD: {
       label: "Drop D",
       summary: "Drop D tuning, high E on top.",
-      tuning: notes("E", "B", "G", "D", "A", "D")
+      tuning: notes("E", "B", "G", "D", "A", "D"),
+      openMidi: [64, 59, 55, 50, 45, 38]
     },
     dadgad: {
       label: "DADGAD",
       summary: "DADGAD tuning, high D on top.",
-      tuning: notes("D", "A", "G", "D", "A", "D")
+      tuning: notes("D", "A", "G", "D", "A", "D"),
+      openMidi: [62, 57, 55, 50, 45, 38]
     },
     openD: {
       label: "Open D",
       summary: "Open D tuning, high D on top.",
-      tuning: notes("D", "A", "F#", "D", "A", "D")
+      tuning: notes("D", "A", "F#", "D", "A", "D"),
+      openMidi: [62, 57, 54, 50, 45, 38]
     },
     openG: {
       label: "Open G",
       summary: "Open G tuning, high D on top.",
-      tuning: notes("D", "B", "G", "D", "G", "D")
+      tuning: notes("D", "B", "G", "D", "G", "D"),
+      openMidi: [62, 59, 55, 50, 43, 38]
     },
     openC: {
       label: "Open C",
       summary: "Open C tuning, high E on top.",
-      tuning: notes("E", "C", "G", "C", "G", "C")
+      tuning: notes("E", "C", "G", "C", "G", "C"),
+      openMidi: [64, 60, 55, 48, 43, 36]
     },
     openE: {
       label: "Open E",
       summary: "Open E tuning, high E on top.",
-      tuning: notes("E", "B", "G#", "E", "B", "E")
+      tuning: notes("E", "B", "G#", "E", "B", "E"),
+      openMidi: [64, 59, 56, 52, 47, 40]
     },
     halfStepDown: {
       label: "Half-step down",
       summary: "Half-step down tuning, high Eb on top.",
-      tuning: notes("Eb", "Bb", "Gb", "Db", "Ab", "Eb")
+      tuning: notes("Eb", "Bb", "Gb", "Db", "Ab", "Eb"),
+      openMidi: [63, 58, 54, 49, 44, 39]
     },
     allFourths: {
       label: "All fourths",
       summary: "All-fourths tuning, high F on top.",
-      tuning: notes("F", "C", "G", "D", "A", "E")
+      tuning: notes("F", "C", "G", "D", "A", "E"),
+      openMidi: [65, 60, 55, 50, 45, 40]
     }
   },
   bass: {
     standard: {
       label: "Standard (4-string)",
       summary: "4-string standard tuning, G on top.",
-      tuning: notes("G", "D", "A", "E")
+      tuning: notes("G", "D", "A", "E"),
+      openMidi: [43, 38, 33, 28]
     },
     standard5: {
       label: "Standard (5-string)",
       summary: "5-string standard tuning, G on top.",
-      tuning: notes("G", "D", "A", "E", "B")
+      tuning: notes("G", "D", "A", "E", "B"),
+      openMidi: [43, 38, 33, 28, 23]
     },
     standard6: {
       label: "Standard (6-string)",
       summary: "6-string standard tuning, high C on top.",
-      tuning: notes("C", "G", "D", "A", "E", "B")
+      tuning: notes("C", "G", "D", "A", "E", "B"),
+      openMidi: [48, 43, 38, 33, 28, 23]
     },
     dropD: {
       label: "Drop D",
       summary: "4-string drop D tuning, G on top.",
-      tuning: notes("G", "D", "A", "D")
+      tuning: notes("G", "D", "A", "D"),
+      openMidi: [43, 38, 33, 38]
     },
     bead: {
       label: "BEAD",
       summary: "BEAD tuning, high D on top.",
-      tuning: notes("D", "A", "E", "B")
+      tuning: notes("D", "A", "E", "B"),
+      openMidi: [38, 33, 28, 23]
     },
     tenor: {
       label: "Tenor",
       summary: "Tenor bass tuning, high C on top.",
-      tuning: notes("C", "G", "D", "A")
+      tuning: notes("C", "G", "D", "A"),
+      openMidi: [48, 43, 38, 33]
     },
     halfStepDown: {
       label: "Half-step down",
       summary: "4-string half-step down tuning, high Gb on top.",
-      tuning: notes("Gb", "Db", "Ab", "Eb")
+      tuning: notes("Gb", "Db", "Ab", "Eb"),
+      openMidi: [42, 37, 32, 27]
     }
   },
   banjo: {
     openG: {
       label: "Open G",
       summary: "5-string Open G tuning, high G drone on top.",
-      tuning: notes({ label: "G", startFret: 5 }, "D", "B", "G", "D")
+      tuning: notes({ label: "G", startFret: 5 }, "D", "B", "G", "D"),
+      openMidi: [67, 50, 47, 43, 38]
     },
     gMinor: {
       label: "G Minor",
       summary: "5-string G Minor tuning, high G drone on top.",
-      tuning: notes({ label: "G", startFret: 5 }, "D", "Bb", "G", "D")
+      tuning: notes({ label: "G", startFret: 5 }, "D", "Bb", "G", "D"),
+      openMidi: [67, 50, 46, 43, 38]
     },
     cTuning: {
       label: "C tuning",
       summary: "5-string C tuning, high G drone on top.",
-      tuning: notes({ label: "G", startFret: 5 }, "D", "B", "G", "C")
+      tuning: notes({ label: "G", startFret: 5 }, "D", "B", "G", "C"),
+      openMidi: [67, 50, 47, 43, 36]
     },
     doubleC: {
       label: "Double C",
       summary: "5-string Double C tuning, high G drone on top.",
-      tuning: notes({ label: "G", startFret: 5 }, "D", "C", "G", "C")
+      tuning: notes({ label: "G", startFret: 5 }, "D", "C", "G", "C"),
+      openMidi: [67, 50, 48, 43, 36]
     },
     sawmill: {
       label: "Sawmill",
       summary: "5-string Sawmill tuning, high G drone on top.",
-      tuning: notes({ label: "G", startFret: 5 }, "D", "C", "G", "D")
+      tuning: notes({ label: "G", startFret: 5 }, "D", "C", "G", "D"),
+      openMidi: [67, 50, 48, 43, 38]
     },
     doubleD: {
       label: "Double D",
       summary: "5-string Double D tuning, high A drone on top.",
-      tuning: notes({ label: "A", startFret: 5 }, "E", "D", "A", "D")
+      tuning: notes({ label: "A", startFret: 5 }, "E", "D", "A", "D"),
+      openMidi: [69, 52, 50, 45, 38]
     },
     openD: {
       label: "Open D",
       summary: "5-string Open D tuning, high F# drone on top.",
-      tuning: notes({ label: "F#", startFret: 5 }, "D", "A", "F#", "D")
+      tuning: notes({ label: "F#", startFret: 5 }, "D", "A", "F#", "D"),
+      openMidi: [66, 50, 45, 42, 38]
     }
   },
   ukulele: {
     standard: {
       label: "Standard (GCEA)",
       summary: "Standard C tuning, high A on top.",
-      tuning: notes("A", "E", "C", "G")
+      tuning: notes("A", "E", "C", "G"),
+      openMidi: [69, 64, 60, 67]
     },
     lowG: {
       label: "Low G (GCEA)",
       summary: "Low G tuning, high A on top.",
-      tuning: notes("A", "E", "C", "G")
+      tuning: notes("A", "E", "C", "G"),
+      openMidi: [69, 64, 60, 55]
     },
     dTuning: {
       label: "D tuning (ADF#B)",
       summary: "D tuning, high B on top.",
-      tuning: notes("B", "F#", "D", "A")
+      tuning: notes("B", "F#", "D", "A"),
+      openMidi: [71, 66, 62, 57]
     },
     baritone: {
       label: "Baritone (DGBE)",
       summary: "Baritone tuning, high E on top.",
-      tuning: notes("E", "B", "G", "D")
+      tuning: notes("E", "B", "G", "D"),
+      openMidi: [64, 59, 55, 50]
     }
   }
 };

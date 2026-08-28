@@ -578,8 +578,12 @@ function chordTabMarkup(chord) {
   `;
 }
 
-function stringBasePitchesHighToLow(strings) {
+function stringBasePitchesHighToLow(strings, openMidi) {
   if (!strings.length) return [];
+
+  if (Array.isArray(openMidi) && openMidi.length === strings.length) {
+    return openMidi.map((midi, index) => midi - stringStartFret(strings[index]));
+  }
 
   const pitches = [60 + strings[0].pc];
   for (let index = 1; index < strings.length; index += 1) {
@@ -589,6 +593,13 @@ function stringBasePitchesHighToLow(strings) {
   }
 
   return pitches;
+}
+
+function stringMidiAtFret(string, fret, stringIndex, tuning) {
+  if (Array.isArray(tuning.openMidi) && Number.isFinite(tuning.openMidi[stringIndex])) {
+    return tuning.openMidi[stringIndex] + fret - stringStartFret(string);
+  }
+  return stringBasePitchesHighToLow(tuning.tuning)[stringIndex] + fret;
 }
 
 function chordLibraryWindows(range, maxStretch) {
@@ -698,7 +709,7 @@ function scoreChordLibraryVoicing(voicing, chord, stringPitches, maxStretch) {
 function chordLibraryVoicings(chord) {
   const tuning = currentTuning();
   const range = visibleFretRange();
-  const stringPitches = stringBasePitchesHighToLow(tuning.tuning);
+  const stringPitches = stringBasePitchesHighToLow(tuning.tuning, tuning.openMidi);
   const maxStretch = chordLibraryMaxStretch(tuning.tuning.length);
   const windows = chordLibraryWindows(range, maxStretch);
   const voicings = new Map();
@@ -1111,7 +1122,9 @@ function playSingleNote(string, fret, cell) {
   playbackState.kind = "note";
   playbackState.keyIndex = state.keyIndex;
   setPlaybackStatus(`Playing ${noteName(stringPcAtFret(string, fret))}.`);
-  const midi = stringBasePitchesHighToLow(currentTuning().tuning)[currentTuning().tuning.indexOf(string)] + fret;
+  const current = currentTuning();
+  const stringIndex = current.tuning.indexOf(string);
+  const midi = stringMidiAtFret(string, fret, stringIndex, current);
   player.play([{ midi, start: 0, duration: 0.45, velocity: 0.9 }], {
     onEnd: () => {
       cell.classList.remove("is-playing");
