@@ -108,7 +108,8 @@ const playbackState = {
   tempo: 100,
   token: 0,
   scaleKey: null,
-  error: null
+  error: null,
+  previousBar: null
 };
 const playingCells = new Set();
 let selectedChordVoicing = null;
@@ -164,13 +165,20 @@ function setPlaybackStatus(message = "") {
   setText("playbackStatus", message);
 }
 
-function stopPlayback() {
+function stopPlayback({ restoreBar = false } = {}) {
+  const wasProgression = playbackState.kind === "progression";
+  const previousBar = playbackState.previousBar;
   playbackState.token += 1;
   playbackPlayer()?.stop();
   playbackState.kind = null;
   playbackState.keyIndex = null;
   playbackState.scaleKey = null;
+  playbackState.previousBar = null;
   playbackState.error = null;
+  if (restoreBar && wasProgression && Number.isInteger(previousBar)) {
+    state.currentBar = Math.min(previousBar, currentProgression().bars.length - 1);
+    saveState();
+  }
   clearPlayingCells();
   setPlaybackStatus("");
   updateScalePlayButtons();
@@ -188,6 +196,7 @@ function playbackError(error) {
   updateScalePlayButtons();
   updateChordPlaybackControls();
   updateTriadPlaybackControls();
+  updateProgressionPlaybackControls();
 }
 
 function pc(value) {
@@ -378,6 +387,7 @@ function playProgression() {
   const token = playbackState.token;
   playbackState.kind = "progression";
   playbackState.keyIndex = state.keyIndex;
+  playbackState.previousBar = state.currentBar;
   state.currentBar = 0;
   renderProgression();
   renderFretboard();
@@ -388,6 +398,7 @@ function playProgression() {
       if (token !== playbackState.token || playbackState.kind !== "progression") return;
       if (!Number.isInteger(event.barIndex) || event.barIndex === state.currentBar) return;
       state.currentBar = event.barIndex;
+      saveState();
       renderProgression();
       renderFretboard();
       renderDetails();
@@ -397,6 +408,7 @@ function playProgression() {
       if (token !== playbackState.token) return;
       playbackState.kind = null;
       playbackState.keyIndex = null;
+      playbackState.previousBar = null;
       setPlaybackStatus("");
       updateProgressionPlaybackControls();
     },
@@ -2061,10 +2073,10 @@ function bindEvents() {
     event.target.value = String(playbackState.tempo);
   });
 
-  bindIfPresent(els.stopPlayback, "click", stopPlayback);
-  bindIfPresent(els.stopProgressionPlayback, "click", stopPlayback);
+  bindIfPresent(els.stopPlayback, "click", () => stopPlayback({ restoreBar: true }));
+  bindIfPresent(els.stopProgressionPlayback, "click", () => stopPlayback({ restoreBar: true }));
   bindIfPresent(els.playProgression, "click", () => {
-    if (playbackState.kind === "progression") stopPlayback();
+    if (playbackState.kind === "progression") stopPlayback({ restoreBar: true });
     else playProgression();
   });
   bindIfPresent(els.playCurrentChord, "click", () => {
