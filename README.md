@@ -128,6 +128,16 @@ Bass tunings:
 - Tenor
 - Half-step down
 
+Banjo tunings:
+
+- Open G
+- G Minor
+- C tuning
+- Double C
+- Sawmill
+- Double D
+- Open D
+
 ## Project Layout
 
 - `index.html` - scales tool

@@ -887,6 +887,10 @@ const INSTRUMENTS = {
   bass: {
     label: "Bass",
     defaultTuning: "standard"
+  },
+  banjo: {
+    label: "Banjo",
+    defaultTuning: "openG"
   }
 };
 
@@ -973,6 +977,43 @@ const TUNINGS = {
       label: "Half-step down",
       summary: "4-string half-step down tuning, high Gb on top.",
       tuning: notes("Gb", "Db", "Ab", "Eb")
+    }
+  },
+  banjo: {
+    openG: {
+      label: "Open G",
+      summary: "5-string Open G tuning, high G drone on top.",
+      tuning: notes("G", "D", "B", "G", "D")
+    },
+    gMinor: {
+      label: "G Minor",
+      summary: "5-string G Minor tuning, high G drone on top.",
+      tuning: notes("G", "D", "Bb", "G", "D")
+    },
+    cTuning: {
+      label: "C tuning",
+      summary: "5-string C tuning, high G drone on top.",
+      tuning: notes("G", "D", "B", "G", "C")
+    },
+    doubleC: {
+      label: "Double C",
+      summary: "5-string Double C tuning, high G drone on top.",
+      tuning: notes("G", "D", "C", "G", "C")
+    },
+    sawmill: {
+      label: "Sawmill",
+      summary: "5-string Sawmill tuning, high G drone on top.",
+      tuning: notes("G", "D", "C", "G", "D")
+    },
+    doubleD: {
+      label: "Double D",
+      summary: "5-string Double D tuning, high A drone on top.",
+      tuning: notes("A", "E", "D", "A", "D")
+    },
+    openD: {
+      label: "Open D",
+      summary: "5-string Open D tuning, high F# drone on top.",
+      tuning: notes("F#", "D", "A", "F#", "D")
     }
   }
 };
