@@ -742,6 +742,20 @@ body {
   color: #fff;
 }
 
+.playback-button {
+  white-space: nowrap;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
+}
+
+.playback-button:hover:not(:disabled),
+.playback-button:focus-visible:not(:disabled) {
+  box-shadow: 0 0 0 .16rem rgba(32, 33, 36, .16);
+}
+
+.playback-button:disabled {
+  cursor: not-allowed;
+}
+
 .roman-badge {
   display: inline-flex;
   align-items: center;
@@ -855,11 +869,22 @@ body {
   font-size: .8rem;
 }
 
+.playback-controls input:focus-visible,
+.playback-button:focus-visible,
+.scale-play-button:focus-visible {
+  outline: 3px solid #f4c866;
+  outline-offset: 2px;
+}
+
 .playback-status {
   min-height: 1.25rem;
   margin: -.5rem 0 .75rem;
   color: var(--muted);
   font-size: .82rem;
+}
+
+.playback-status:empty {
+  margin-bottom: 0;
 }
 
 .detail-list span {
@@ -1400,6 +1425,29 @@ body {
 
   .triad-trainer-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575.98px) {
+  .playback-controls {
+    align-items: stretch;
+    gap: .5rem;
+  }
+
+  .playback-controls label {
+    align-self: center;
+  }
+
+  .playback-controls .playback-button {
+    flex: 1 1 auto;
+  }
+
+  .chord-playback-controls .playback-button {
+    min-width: 5.5rem;
+  }
+
+  .playback-status {
+    margin-top: .15rem;
   }
 }
 
