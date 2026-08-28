@@ -28,7 +28,7 @@ Then open `http://localhost:8000/`.
 
 ## Current Features
 
-- Guitar and bass fretboards.
+- Guitar, bass, banjo, and ukulele fretboards.
 - Key selection with sharp/flat spelling.
 - Note-label and interval-label modes.
 - 12, 15, 17, 20, and 24 fret ranges.
@@ -41,7 +41,7 @@ Then open `http://localhost:8000/`.
 
 ### Scales
 
-The scales page lets you combine multiple key-relative scale layers on the same fretboard. The default view highlights minor blues, and an active scale palette shows the notes and interval roles for selected layers.
+The scales page lets you combine multiple key-relative scale layers on the same fretboard. The default view highlights minor blues, and an active scale palette shows the notes and interval roles for selected layers. Each palette entry can play the scale ascending and descending from the selected key.
 
 Included scale families:
 
