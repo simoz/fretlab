@@ -978,7 +978,7 @@ const TUNINGS = {
       label: "Drop D",
       summary: "4-string drop D tuning, G on top.",
       tuning: notes("G", "D", "A", "D"),
-      openMidi: [43, 38, 33, 38]
+      openMidi: [43, 38, 33, 26]
     },
     bead: {
       label: "BEAD",
