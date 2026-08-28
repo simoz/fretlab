@@ -732,6 +732,16 @@ body {
   overflow-wrap: anywhere;
 }
 
+.chord-playback-controls {
+  margin: 1rem 0 .25rem;
+}
+
+.playback-button[aria-pressed="true"] {
+  background: var(--header);
+  border-color: var(--header);
+  color: #fff;
+}
+
 .roman-badge {
   display: inline-flex;
   align-items: center;
@@ -989,6 +999,20 @@ body {
   border-radius: 8px;
   background: #fff;
   box-shadow: 0 10px 24px rgba(32, 33, 36, .05);
+}
+
+.chord-card.is-selected {
+  border-color: var(--header);
+  box-shadow: 0 0 0 2px rgba(35, 63, 92, .16), 0 10px 24px rgba(32, 33, 36, .08);
+}
+
+.chord-card[role="button"] {
+  cursor: pointer;
+}
+
+.chord-card[role="button"]:focus-visible {
+  outline: 3px solid #f4c866;
+  outline-offset: 2px;
 }
 
 .chord-card-heading {

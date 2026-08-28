@@ -110,6 +110,7 @@ const playbackState = {
   error: null
 };
 const playingCells = new Set();
+let selectedChordVoicing = null;
 
 const els = {};
 
@@ -171,6 +172,7 @@ function stopPlayback() {
   clearPlayingCells();
   setPlaybackStatus("");
   updateScalePlayButtons();
+  updateChordPlaybackControls();
 }
 
 function playbackError(error) {
@@ -180,6 +182,7 @@ function playbackError(error) {
   clearPlayingCells();
   setPlaybackStatus(error?.message || "Audio playback is unavailable.");
   updateScalePlayButtons();
+  updateChordPlaybackControls();
 }
 
 function pc(value) {
@@ -1257,6 +1260,66 @@ function toggleScalePlayback(scaleKey) {
   }
 }
 
+function chordVoicingKey(voicing) {
+  return voicing?.frets?.map((fret) => fret ?? "x").join("-") || "";
+}
+
+function playableChordEvents(voicing) {
+  if (!voicing || !Array.isArray(voicing.voicing)) return [];
+  const tuning = currentTuning();
+  const stepDuration = 60 / playbackState.tempo;
+
+  return voicing.voicing.flatMap((item, stringIndex) => {
+    const fret = Number(item?.fret);
+    const string = tuning.tuning[stringIndex];
+    if (!string || item?.fret === null || !Number.isInteger(fret) || fret < stringStartFret(string)) return [];
+    const midi = stringMidiAtFret(string, fret, stringIndex, tuning);
+    return Number.isFinite(midi)
+      ? [{ midi, start: 0, duration: Math.max(0.25, stepDuration * 0.9), velocity: 0.8 }]
+      : [];
+  });
+}
+
+function updateChordPlaybackControls() {
+  if (!els.playCurrentChord) return;
+  const isPlaying = playbackState.kind === "chord";
+  const hasVoicing = Boolean(selectedChordVoicing);
+  els.playCurrentChord.disabled = !hasVoicing;
+  els.playCurrentChord.textContent = isPlaying ? "■ Stop" : "▶ Play";
+  els.playCurrentChord.setAttribute("aria-pressed", String(isPlaying));
+  els.playCurrentChord.setAttribute("aria-label", `${isPlaying ? "Stop" : "Play"} current chord`);
+  if (els.stopPlayback) els.stopPlayback.disabled = !isPlaying;
+}
+
+function playCurrentChord() {
+  const events = playableChordEvents(selectedChordVoicing);
+  if (!events.length) {
+    setPlaybackStatus("Cannot play an empty chord voicing.");
+    updateChordPlaybackControls();
+    return;
+  }
+  const player = playbackPlayer();
+  if (!player) {
+    playbackError(new Error("Audio playback is unavailable."));
+    return;
+  }
+
+  stopPlayback();
+  playbackState.kind = "chord";
+  playbackState.keyIndex = state.keyIndex;
+  setPlaybackStatus(`Playing ${currentChord().name}.`);
+  player.play(events, {
+    onEnd: () => {
+      playbackState.kind = null;
+      playbackState.keyIndex = null;
+      setPlaybackStatus("");
+      updateChordPlaybackControls();
+    },
+    onError: playbackError
+  });
+  updateChordPlaybackControls();
+}
+
 function renderChordLibrary() {
   if (!els.chordLibraryGrid) return;
 
@@ -1272,6 +1335,10 @@ function renderChordLibrary() {
     ? allVoicings
     : allVoicings.filter((voicing) => chordInversionId(voicing.inversionIndex) === state.chordInversion);
   const displayVoicings = chordLibraryDisplayVoicings(selectedVoicings);
+  const selectedKey = chordVoicingKey(selectedChordVoicing);
+  selectedChordVoicing = displayVoicings.find((voicing) => chordVoicingKey(voicing) === selectedKey)
+    || displayVoicings[0]
+    || null;
   const selectedCount = selectedVoicings.length;
   const shownLabel = displayVoicings.length === selectedCount
     ? String(selectedCount)
@@ -1291,6 +1358,7 @@ function renderChordLibrary() {
   displayVoicings.forEach((voicing) => {
     els.chordLibraryGrid.append(renderChordCard(chord, voicing));
   });
+  updateChordPlaybackControls();
 }
 
 function renderChordInversionFilters(inversionOptions, totalCount) {
@@ -1338,7 +1406,25 @@ function renderChordCard(chord, voicing) {
   const inversionName = chordInversionName(voicing.inversionIndex);
   const shape = formatVoicingFrets(voicing.frets);
   card.className = "chord-card";
+  const isSelected = chordVoicingKey(voicing) === chordVoicingKey(selectedChordVoicing);
+  card.classList.toggle("is-selected", isSelected);
+  card.tabIndex = 0;
+  card.setAttribute("role", "button");
   card.setAttribute("aria-label", `${chord.name}, ${inversionName}, shape ${shape}`);
+  card.setAttribute("aria-pressed", String(isSelected));
+  const selectVoicing = () => {
+    stopPlayback();
+    selectedChordVoicing = voicing;
+    renderChordLibrary();
+    updateChordPlaybackControls();
+  };
+  card.addEventListener("click", selectVoicing);
+  card.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      selectVoicing();
+    }
+  });
 
   const heading = document.createElement("div");
   heading.className = "chord-card-heading";
@@ -1541,6 +1627,8 @@ function syncControls() {
   if (els.triadStringGroup) els.triadStringGroup.value = currentTriadStringGroup()?.value || "";
   if (els.triadInversion) els.triadInversion.value = String(state.triadInversion);
   if (els.triadTrainerLabels) els.triadTrainerLabels.value = state.triadTrainerLabels;
+  if (els.playbackTempo) els.playbackTempo.value = String(playbackState.tempo);
+  updateChordPlaybackControls();
   document.querySelectorAll(".layer-toggle").forEach((input) => {
     input.checked = state.layers[input.dataset.layer];
     input.disabled = !isLayerAllowed(input.dataset.layer);
@@ -1800,6 +1888,10 @@ function bindEvents() {
   });
 
   bindIfPresent(els.stopPlayback, "click", stopPlayback);
+  bindIfPresent(els.playCurrentChord, "click", () => {
+    if (playbackState.kind === "chord") stopPlayback();
+    else playCurrentChord();
+  });
 
   bindIfPresent(els.instrumentSelect, "change", (event) => {
     state.instrument = event.target.value;
@@ -2059,6 +2151,7 @@ function cacheElements() {
     "guideToneList",
     "rootFifthList",
     "playbackTempo",
+    "playCurrentChord",
     "stopPlayback",
     "playbackStatus"
   ].forEach((id) => {
