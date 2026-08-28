@@ -435,6 +435,24 @@ body {
   border-bottom: 1px solid #e2e7ed;
 }
 
+.fret-cell[role="button"] {
+  cursor: pointer;
+}
+
+.fret-cell[role="button"]:focus-visible {
+  outline: 3px solid #f4c866;
+  outline-offset: -3px;
+}
+
+.fret-cell.is-playing {
+  background: #fff4c7;
+}
+
+.fret-cell.is-playing .note-marker {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 .2rem rgba(196, 138, 18, .3), 0 8px 18px rgba(23, 25, 28, .18);
+}
+
 .fret-cell.is-open-string {
   border-left-width: 0;
   border-right: 0;
@@ -804,6 +822,34 @@ body {
   border-color: var(--header);
   background: var(--header);
   color: #fff;
+}
+
+.playback-controls {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  flex-wrap: wrap;
+}
+
+.playback-controls label {
+  color: var(--muted);
+  font-size: .75rem;
+  font-weight: 800;
+}
+
+.playback-controls input {
+  width: 4.5rem;
+  padding: .28rem .4rem;
+  border: 1px solid #8c96a5;
+  border-radius: 6px;
+  font-size: .8rem;
+}
+
+.playback-status {
+  min-height: 1.25rem;
+  margin: -.5rem 0 .75rem;
+  color: var(--muted);
+  font-size: .82rem;
 }
 
 .detail-list span {

@@ -101,14 +101,15 @@ const state = {
   vocabulary: { ...DEFAULT_VOCABULARY }
 };
 
-const scalePlaybackState = {
-  audioContext: null,
-  scaleKey: null,
+const playbackState = {
+  player: null,
+  kind: null,
   keyIndex: null,
-  sources: new Set(),
-  timerId: null,
-  playbackId: 0
+  tempo: 100,
+  scaleKey: null,
+  error: null
 };
+const playingCells = new Set();
 
 const els = {};
 
@@ -143,6 +144,42 @@ function setText(id, text) {
 
 function bindIfPresent(element, eventName, handler) {
   if (element) element.addEventListener(eventName, handler);
+}
+
+function playbackPlayer() {
+  if (!playbackState.player && window.FretLabAudio) {
+    playbackState.player = window.FretLabAudio.createPlayer();
+  }
+  return playbackState.player;
+}
+
+function clearPlayingCells() {
+  playingCells.forEach((cell) => cell.classList.remove("is-playing"));
+  playingCells.clear();
+}
+
+function setPlaybackStatus(message = "") {
+  setText("playbackStatus", message);
+}
+
+function stopPlayback() {
+  playbackPlayer()?.stop();
+  playbackState.kind = null;
+  playbackState.keyIndex = null;
+  playbackState.scaleKey = null;
+  playbackState.error = null;
+  clearPlayingCells();
+  setPlaybackStatus("");
+  updateScalePlayButtons();
+}
+
+function playbackError(error) {
+  playbackState.error = error;
+  playbackState.kind = null;
+  playbackState.scaleKey = null;
+  clearPlayingCells();
+  setPlaybackStatus(error?.message || "Audio playback is unavailable.");
+  updateScalePlayButtons();
 }
 
 function pc(value) {
@@ -1037,6 +1074,17 @@ function renderFretCell(string, fret, chord, isOpenString, isNutAdjacent, string
   const markerClass = !isOpenString && FRET_MARKERS.has(fret) ? ` has-marker fret-marker-${fret}` : "";
   cell.className = `fret-cell${isOpenString ? " is-open-string" : ""}${isNutAdjacent ? " is-nut-adjacent" : ""}${markerClass}`;
   cell.dataset.note = noteName(notePc);
+  cell.tabIndex = 0;
+  cell.setAttribute("role", "button");
+  cell.setAttribute("aria-label", `${noteName(notePc)} at fret ${fret} on ${string.label}`);
+  const playNote = () => playSingleNote(string, fret, cell);
+  cell.addEventListener("click", playNote);
+  cell.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      playNote();
+    }
+  });
 
   if (info) {
     const marker = document.createElement("span");
@@ -1048,6 +1096,31 @@ function renderFretCell(string, fret, chord, isOpenString, isNutAdjacent, string
   }
 
   return cell;
+}
+
+function playSingleNote(string, fret, cell) {
+  const player = playbackPlayer();
+  if (!player) {
+    playbackError(new Error("Audio playback is unavailable."));
+    return;
+  }
+  stopPlayback();
+  clearPlayingCells();
+  cell.classList.add("is-playing");
+  playingCells.add(cell);
+  playbackState.kind = "note";
+  playbackState.keyIndex = state.keyIndex;
+  setPlaybackStatus(`Playing ${noteName(stringPcAtFret(string, fret))}.`);
+  const midi = stringBasePitchesHighToLow(currentTuning().tuning)[currentTuning().tuning.indexOf(string)] + fret;
+  player.play([{ midi, start: 0, duration: 0.45, velocity: 0.9 }], {
+    onEnd: () => {
+      cell.classList.remove("is-playing");
+      playingCells.delete(cell);
+      playbackState.kind = null;
+      setPlaybackStatus("");
+    },
+    onError: playbackError
+  });
 }
 
 function renderDetails() {
@@ -1079,10 +1152,6 @@ function renderScalePalette() {
   if (!els.scalePaletteList) return;
 
   const shouldShowPalette = hasActiveScaleLayer();
-  const activeScaleStillVisible = scalePlaybackState.scaleKey
-    && isLayerActive(scalePlaybackState.scaleKey)
-    && scalePlaybackState.keyIndex === state.keyIndex;
-  if (scalePlaybackState.scaleKey && !activeScaleStillVisible) stopScalePlayback();
   if (els.scalePalettePanel) els.scalePalettePanel.hidden = !shouldShowPalette;
   if (!shouldShowPalette) {
     els.scalePaletteList.innerHTML = "";
@@ -1112,9 +1181,9 @@ function renderScalePalette() {
     playButton.type = "button";
     playButton.className = "scale-play-button";
     playButton.dataset.scalePlay = scaleKey;
-    playButton.textContent = scalePlaybackState.scaleKey === scaleKey ? "■ Stop" : "▶ Play";
-    playButton.setAttribute("aria-label", `${scalePlaybackState.scaleKey === scaleKey ? "Stop" : "Play"} ${scale.label} in ${currentKey().label}`);
-    playButton.setAttribute("aria-pressed", String(scalePlaybackState.scaleKey === scaleKey));
+    playButton.textContent = playbackState.scaleKey === scaleKey ? "■ Stop" : "▶ Play";
+    playButton.setAttribute("aria-label", `${playbackState.scaleKey === scaleKey ? "Stop" : "Play"} ${scale.label} in ${currentKey().label}`);
+    playButton.setAttribute("aria-pressed", String(playbackState.scaleKey === scaleKey));
     playButton.addEventListener("click", () => toggleScalePlayback(scaleKey));
     appendToneItems(notes, scaleNotes(scaleKey));
     header.append(label, playButton);
@@ -1123,81 +1192,53 @@ function renderScalePalette() {
   });
 }
 
-function scaleAudioContext() {
-  if (!scalePlaybackState.audioContext) {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    scalePlaybackState.audioContext = new AudioContextClass();
-  }
-  return scalePlaybackState.audioContext;
-}
-
-function scheduleScaleNote(context, midiNote, startAt, duration) {
-  const oscillator = context.createOscillator();
-  const gain = context.createGain();
-  const frequency = 440 * (2 ** ((midiNote - 69) / 12));
-
-  oscillator.type = "triangle";
-  oscillator.frequency.setValueAtTime(frequency, startAt);
-  gain.gain.setValueAtTime(0.0001, startAt);
-  gain.gain.exponentialRampToValueAtTime(0.22, startAt + 0.015);
-  gain.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
-  oscillator.connect(gain);
-  gain.connect(context.destination);
-  oscillator.addEventListener("ended", () => scalePlaybackState.sources.delete(oscillator));
-  scalePlaybackState.sources.add(oscillator);
-  oscillator.start(startAt);
-  oscillator.stop(startAt + duration);
-}
-
 function updateScalePlayButtons() {
   document.querySelectorAll("[data-scale-play]").forEach((button) => {
     const scale = SCALES[button.dataset.scalePlay];
-    const playing = button.dataset.scalePlay === scalePlaybackState.scaleKey;
+    const playing = button.dataset.scalePlay === playbackState.scaleKey;
     button.textContent = playing ? "■ Stop" : "▶ Play";
     button.setAttribute("aria-label", `${playing ? "Stop" : "Play"} ${scale.label} in ${currentKey().label}`);
     button.setAttribute("aria-pressed", String(playing));
   });
 }
 
-function stopScalePlayback(updateButtons = true) {
-  scalePlaybackState.playbackId += 1;
-  window.clearTimeout(scalePlaybackState.timerId);
-  scalePlaybackState.timerId = null;
-  scalePlaybackState.sources.forEach((source) => source.stop());
-  scalePlaybackState.sources.clear();
-  scalePlaybackState.scaleKey = null;
-  scalePlaybackState.keyIndex = null;
-  if (updateButtons) updateScalePlayButtons();
-}
-
-async function playScale(scaleKey) {
-  stopScalePlayback(false);
-  const playbackId = scalePlaybackState.playbackId;
-  const context = scaleAudioContext();
-  await context.resume();
-  if (playbackId !== scalePlaybackState.playbackId) return;
-
+function playScale(scaleKey) {
+  const player = playbackPlayer();
+  if (!player) {
+    playbackError(new Error("Audio playback is unavailable."));
+    return;
+  }
+  stopPlayback();
   const scale = SCALES[scaleKey];
-  const intervals = [...scale.intervals, 12, ...scale.intervals.slice(1).reverse(), 0];
-  const stepDuration = 0.3;
-  const firstNoteAt = context.currentTime + 0.05;
+  const intervals = [...scale.intervals, 12, ...scale.intervals.slice().reverse()];
+  const stepDuration = 30 / playbackState.tempo;
   const rootMidiNote = 60 + currentKey().pc;
-
-  scalePlaybackState.scaleKey = scaleKey;
-  scalePlaybackState.keyIndex = state.keyIndex;
-  intervals.forEach((interval, index) => {
-    scheduleScaleNote(context, rootMidiNote + interval, firstNoteAt + index * stepDuration, stepDuration * 0.9);
+  const events = intervals.map((interval, index) => ({
+    midi: rootMidiNote + interval,
+    start: index * stepDuration,
+    duration: stepDuration * 0.85,
+    velocity: 0.8
+  }));
+  playbackState.scaleKey = scaleKey;
+  playbackState.keyIndex = state.keyIndex;
+  playbackState.kind = "scale";
+  setPlaybackStatus(`Playing ${scale.label} in ${currentKey().label}.`);
+  player.play(events, {
+    onEnd: () => {
+      playbackState.kind = null;
+      playbackState.scaleKey = null;
+      playbackState.keyIndex = null;
+      setPlaybackStatus("");
+      updateScalePlayButtons();
+    },
+    onError: playbackError
   });
-  scalePlaybackState.timerId = window.setTimeout(
-    () => stopScalePlayback(),
-    (intervals.length * stepDuration + 0.1) * 1000
-  );
   updateScalePlayButtons();
 }
 
 function toggleScalePlayback(scaleKey) {
-  if (scalePlaybackState.scaleKey === scaleKey) {
-    stopScalePlayback();
+  if (playbackState.scaleKey === scaleKey) {
+    stopPlayback();
   } else {
     playScale(scaleKey);
   }
@@ -1407,6 +1448,7 @@ function renderDiagramDot(item) {
 }
 
 function render() {
+  stopPlayback();
   renderProgression();
   renderFretboard();
   renderDetails();
@@ -1738,6 +1780,14 @@ function populateTuningOptions() {
 }
 
 function bindEvents() {
+  bindIfPresent(els.playbackTempo, "change", (event) => {
+    const tempo = Number.parseInt(event.target.value, 10);
+    playbackState.tempo = Math.max(40, Math.min(240, Number.isFinite(tempo) ? tempo : 100));
+    event.target.value = String(playbackState.tempo);
+  });
+
+  bindIfPresent(els.stopPlayback, "click", stopPlayback);
+
   bindIfPresent(els.instrumentSelect, "change", (event) => {
     state.instrument = event.target.value;
     if (!currentTuningOptions()[state.tuning]) state.tuning = currentInstrument().defaultTuning;
@@ -1994,7 +2044,10 @@ function cacheElements() {
     "triadToneList",
     "targetNoteList",
     "guideToneList",
-    "rootFifthList"
+    "rootFifthList",
+    "playbackTempo",
+    "stopPlayback",
+    "playbackStatus"
   ].forEach((id) => {
     els[id] = document.getElementById(id);
   });
@@ -2003,6 +2056,7 @@ function cacheElements() {
 function init() {
   cacheElements();
   loadState();
+  playbackState.player = window.FretLabAudio?.createPlayer() || null;
   applyPageDefaults();
   populateControls();
   bindEvents();
