@@ -3,3 +3,5 @@ AGENTS.md
 
 # Ignore generated Graphify artifacts
 graphify-out/
+
+.worktrees/
