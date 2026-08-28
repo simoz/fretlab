@@ -106,6 +106,7 @@ const playbackState = {
   kind: null,
   keyIndex: null,
   tempo: 100,
+  token: 0,
   scaleKey: null,
   error: null
 };
@@ -164,6 +165,7 @@ function setPlaybackStatus(message = "") {
 }
 
 function stopPlayback() {
+  playbackState.token += 1;
   playbackPlayer()?.stop();
   playbackState.kind = null;
   playbackState.keyIndex = null;
@@ -174,6 +176,7 @@ function stopPlayback() {
   updateScalePlayButtons();
   updateChordPlaybackControls();
   updateTriadPlaybackControls();
+  updateProgressionPlaybackControls();
 }
 
 function playbackError(error) {
@@ -329,6 +332,79 @@ function chordForBar(barData) {
     tones,
     targets: tones.filter((tone) => tone.target)
   };
+}
+
+function playableProgressionEvents() {
+  const progression = currentProgression();
+  const barDuration = 240 / playbackState.tempo;
+  const rootMidiFor = (rootPc) => 60 + rootPc;
+
+  return progression.bars.flatMap((barData, barIndex) => {
+    const chord = chordForBar(barData);
+    const rootMidi = rootMidiFor(chord.rootPc);
+    return chord.tones.map((tone) => ({
+      midi: rootMidi + tone.interval,
+      start: barIndex * barDuration,
+      duration: barDuration * 0.9,
+      velocity: 0.8,
+      barIndex
+    }));
+  });
+}
+
+function updateProgressionPlaybackControls() {
+  if (!els.playProgression) return;
+  const isPlaying = playbackState.kind === "progression";
+  els.playProgression.textContent = isPlaying ? "■ Stop" : "▶ Play";
+  els.playProgression.setAttribute("aria-pressed", String(isPlaying));
+  els.playProgression.setAttribute("aria-label", `${isPlaying ? "Stop" : "Play"} progression`);
+  if (els.stopProgressionPlayback) els.stopProgressionPlayback.disabled = !isPlaying;
+}
+
+function playProgression() {
+  const events = playableProgressionEvents();
+  if (!events.length) {
+    setPlaybackStatus("Cannot play an empty progression.");
+    updateProgressionPlaybackControls();
+    return;
+  }
+  const player = playbackPlayer();
+  if (!player) {
+    playbackError(new Error("Audio playback is unavailable."));
+    return;
+  }
+
+  stopPlayback();
+  const token = playbackState.token;
+  playbackState.kind = "progression";
+  playbackState.keyIndex = state.keyIndex;
+  state.currentBar = 0;
+  renderProgression();
+  renderFretboard();
+  renderDetails();
+  setPlaybackStatus(`Playing ${currentProgression().label} in ${currentKey().label}.`);
+  player.play(events, {
+    onEvent: (event) => {
+      if (token !== playbackState.token || playbackState.kind !== "progression") return;
+      if (!Number.isInteger(event.barIndex) || event.barIndex === state.currentBar) return;
+      state.currentBar = event.barIndex;
+      renderProgression();
+      renderFretboard();
+      renderDetails();
+      setPlaybackStatus(`Playing ${currentProgression().label}: bar ${event.barIndex + 1}.`);
+    },
+    onEnd: () => {
+      if (token !== playbackState.token) return;
+      playbackState.kind = null;
+      playbackState.keyIndex = null;
+      setPlaybackStatus("");
+      updateProgressionPlaybackControls();
+    },
+    onError: (error) => {
+      if (token === playbackState.token) playbackError(error);
+    }
+  });
+  updateProgressionPlaybackControls();
 }
 
 function triadForSelection() {
@@ -1725,6 +1801,7 @@ function syncControls() {
   if (els.triadTrainerLabels) els.triadTrainerLabels.value = state.triadTrainerLabels;
   if (els.playbackTempo) els.playbackTempo.value = String(playbackState.tempo);
   updateChordPlaybackControls();
+  updateProgressionPlaybackControls();
   document.querySelectorAll(".layer-toggle").forEach((input) => {
     input.checked = state.layers[input.dataset.layer];
     input.disabled = !isLayerAllowed(input.dataset.layer);
@@ -1985,6 +2062,11 @@ function bindEvents() {
   });
 
   bindIfPresent(els.stopPlayback, "click", stopPlayback);
+  bindIfPresent(els.stopProgressionPlayback, "click", stopPlayback);
+  bindIfPresent(els.playProgression, "click", () => {
+    if (playbackState.kind === "progression") stopPlayback();
+    else playProgression();
+  });
   bindIfPresent(els.playCurrentChord, "click", () => {
     if (playbackState.kind === "chord") stopPlayback();
     else playCurrentChord();
@@ -2255,6 +2337,8 @@ function cacheElements() {
     "guideToneList",
     "rootFifthList",
     "playbackTempo",
+    "playProgression",
+    "stopProgressionPlayback",
     "playCurrentChord",
     "stopPlayback",
     "playbackStatus"
