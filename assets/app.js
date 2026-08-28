@@ -1334,8 +1334,9 @@ function playableTriadEvents() {
 
   if (!isMap && !shape) return [];
   if (isMap) {
+    const rootMidiNote = 60 + currentKey().pc;
     return chord.tones.map((tone, index) => ({
-      midi: 60 + tone.interval,
+      midi: rootMidiNote + tone.interval,
       start: index * stepDuration,
       duration: stepDuration * 0.8,
       velocity: 0.85
