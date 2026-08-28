@@ -165,9 +165,10 @@ function setPlaybackStatus(message = "") {
   setText("playbackStatus", message);
 }
 
-function stopPlayback({ restoreBar = false } = {}) {
+function stopPlayback({ restoreBar = true } = {}) {
   const wasProgression = playbackState.kind === "progression";
   const previousBar = playbackState.previousBar;
+  const shouldRestoreBar = restoreBar && wasProgression && Number.isInteger(previousBar);
   playbackState.token += 1;
   playbackPlayer()?.stop();
   playbackState.kind = null;
@@ -175,7 +176,7 @@ function stopPlayback({ restoreBar = false } = {}) {
   playbackState.scaleKey = null;
   playbackState.previousBar = null;
   playbackState.error = null;
-  if (restoreBar && wasProgression && Number.isInteger(previousBar)) {
+  if (shouldRestoreBar) {
     state.currentBar = Math.min(previousBar, currentProgression().bars.length - 1);
     saveState();
   }
@@ -185,6 +186,11 @@ function stopPlayback({ restoreBar = false } = {}) {
   updateChordPlaybackControls();
   updateTriadPlaybackControls();
   updateProgressionPlaybackControls();
+  if (shouldRestoreBar) {
+    renderProgression();
+    renderFretboard();
+    renderDetails();
+  }
 }
 
 function playbackError(error) {
@@ -406,11 +412,8 @@ function playProgression() {
     },
     onEnd: () => {
       if (token !== playbackState.token) return;
-      playbackState.kind = null;
-      playbackState.keyIndex = null;
-      playbackState.previousBar = null;
-      setPlaybackStatus("");
-      updateProgressionPlaybackControls();
+      // Explicit stops and natural completion both restore the bar selected before playback.
+      stopPlayback({ restoreBar: true });
     },
     onError: (error) => {
       if (token === playbackState.token) playbackError(error);
@@ -1100,6 +1103,7 @@ function renderProgression() {
       ${chordTabMarkup(chord)}
     `;
     button.addEventListener("click", () => {
+      stopPlayback();
       state.currentBar = index;
       saveState();
       render();
@@ -2090,6 +2094,7 @@ function bindEvents() {
   bindIfPresent(els.stopTriadPlayback, "click", stopPlayback);
 
   bindIfPresent(els.instrumentSelect, "change", (event) => {
+    stopPlayback();
     state.instrument = event.target.value;
     if (!currentTuningOptions()[state.tuning]) state.tuning = currentInstrument().defaultTuning;
     populateTuningOptions();
@@ -2100,18 +2105,21 @@ function bindEvents() {
   });
 
   bindIfPresent(els.tuningSelect, "change", (event) => {
+    stopPlayback();
     state.tuning = event.target.value;
     saveState();
     render();
   });
 
   bindIfPresent(els.keySelect, "change", (event) => {
+    stopPlayback();
     state.keyIndex = Number(event.target.value);
     saveState();
     render();
   });
 
   bindIfPresent(els.progressionFamily, "change", (event) => {
+    stopPlayback();
     state.progressionFamily = event.target.value;
     const previousProgression = state.progression;
     populateProgressionOptions();
@@ -2123,6 +2131,7 @@ function bindEvents() {
   });
 
   bindIfPresent(els.progressionSelect, "change", (event) => {
+    stopPlayback();
     state.progression = event.target.value;
     state.currentBar = Math.min(state.currentBar, currentProgression().bars.length - 1);
     saveState();
@@ -2130,18 +2139,21 @@ function bindEvents() {
   });
 
   bindIfPresent(els.barSelect, "change", (event) => {
+    stopPlayback();
     state.currentBar = Number(event.target.value);
     saveState();
     render();
   });
 
   bindIfPresent(els.prevBar, "click", () => {
+    stopPlayback();
     state.currentBar = pc(state.currentBar - 1) % currentProgression().bars.length;
     saveState();
     render();
   });
 
   bindIfPresent(els.nextBar, "click", () => {
+    stopPlayback();
     state.currentBar = (state.currentBar + 1) % currentProgression().bars.length;
     saveState();
     render();
@@ -2244,6 +2256,7 @@ function bindEvents() {
   });
 
   bindIfPresent(els.newTriadExercise, "click", () => {
+    stopPlayback();
     const groups = triadStringGroups();
     for (let attempt = 0; attempt < 50; attempt += 1) {
       state.keyIndex = Math.floor(Math.random() * KEY_OPTIONS.length);
@@ -2275,6 +2288,7 @@ function bindEvents() {
   document.querySelectorAll(".layer-toggle").forEach((input) => {
     input.addEventListener("change", (event) => {
       if (!isLayerAllowed(event.target.dataset.layer)) return;
+      stopPlayback();
       state.layers[event.target.dataset.layer] = event.target.checked;
       saveState();
       render();
