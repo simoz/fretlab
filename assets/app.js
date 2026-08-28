@@ -173,6 +173,7 @@ function stopPlayback() {
   setPlaybackStatus("");
   updateScalePlayButtons();
   updateChordPlaybackControls();
+  updateTriadPlaybackControls();
 }
 
 function playbackError(error) {
@@ -183,6 +184,7 @@ function playbackError(error) {
   setPlaybackStatus(error?.message || "Audio playback is unavailable.");
   updateScalePlayButtons();
   updateChordPlaybackControls();
+  updateTriadPlaybackControls();
 }
 
 function pc(value) {
@@ -1298,6 +1300,7 @@ function playCurrentChord() {
     updateChordPlaybackControls();
     return;
   }
+
   const player = playbackPlayer();
   if (!player) {
     playbackError(new Error("Audio playback is unavailable."));
@@ -1314,10 +1317,102 @@ function playCurrentChord() {
       playbackState.keyIndex = null;
       setPlaybackStatus("");
       updateChordPlaybackControls();
+      updateTriadPlaybackControls();
     },
     onError: playbackError
   });
   updateChordPlaybackControls();
+}
+
+function playableTriadEvents() {
+  const chord = triadForSelection();
+  const stepDuration = 30 / playbackState.tempo;
+  const isMap = state.triadStudyMode === "map";
+  const shape = isMap || (state.triadStudyMode === "quiz" && !state.triadExerciseRevealed)
+    ? null
+    : currentTriadShape();
+
+  if (!isMap && !shape) return [];
+  if (isMap) {
+    return chord.tones.map((tone, index) => ({
+      midi: 60 + tone.interval,
+      start: index * stepDuration,
+      duration: stepDuration * 0.8,
+      velocity: 0.85
+    }));
+  }
+
+  const tuning = currentTuning();
+  const roleOrder = chord.tones
+    .slice(state.triadInversion)
+    .concat(chord.tones.slice(0, state.triadInversion))
+    .map((tone) => tone.role);
+  const notes = shape.notes
+    .map((item, index) => {
+      const stringIndex = shape.startIndex + index;
+      const string = tuning.tuning[stringIndex];
+      if (!string || !Number.isInteger(item.fret) || item.fret < stringStartFret(string)) return null;
+      const midi = stringMidiAtFret(string, item.fret, stringIndex, tuning);
+      return Number.isFinite(midi) ? { ...item, midi, order: roleOrder.indexOf(item.role) } : null;
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.order - b.order);
+
+  return notes.map((note, index) => ({
+    midi: note.midi,
+    start: index * stepDuration,
+    duration: stepDuration * 0.8,
+    velocity: 0.85
+  }));
+}
+
+function updateTriadPlaybackControls() {
+  if (!els.playCurrentTriad) return;
+  const concealedQuiz = state.triadStudyMode === "quiz" && !state.triadExerciseRevealed;
+  const isPlaying = playbackState.kind === "triad";
+  const hasEvents = playableTriadEvents().length > 0;
+  els.playCurrentTriad.disabled = concealedQuiz || !hasEvents;
+  els.playCurrentTriad.textContent = isPlaying ? "■ Stop" : "▶ Play";
+  els.playCurrentTriad.setAttribute("aria-pressed", String(isPlaying));
+  const shape = state.triadStudyMode === "map" ? null : currentTriadShape();
+  const group = currentTriadStringGroup();
+  const inversion = ["root position", "1st inversion", "2nd inversion"][state.triadInversion];
+  const source = state.triadStudyMode === "map"
+    ? "triad map"
+    : `shape ${shape ? state.triadShapeIndex + 1 : "unavailable"}, ${group?.label || "selected strings"}, ${inversion}`;
+  els.playCurrentTriad.setAttribute("aria-label", `${isPlaying ? "Stop" : "Play"} ${source} in ${currentKey().label}`);
+  if (els.stopTriadPlayback) els.stopTriadPlayback.disabled = !isPlaying;
+}
+
+function playCurrentTriad() {
+  const events = playableTriadEvents();
+  if (!events.length) {
+    setPlaybackStatus(state.triadStudyMode === "quiz" && !state.triadExerciseRevealed
+      ? "Reveal the quiz solution before playing."
+      : "Cannot play an empty triad shape.");
+    updateTriadPlaybackControls();
+    return;
+  }
+  const player = playbackPlayer();
+  if (!player) {
+    playbackError(new Error("Audio playback is unavailable."));
+    return;
+  }
+
+  stopPlayback();
+  playbackState.kind = "triad";
+  playbackState.keyIndex = state.keyIndex;
+  setPlaybackStatus(`Playing ${currentChord().name} ${state.triadStudyMode === "map" ? "map" : "shape"}.`);
+  player.play(events, {
+    onEnd: () => {
+      playbackState.kind = null;
+      playbackState.keyIndex = null;
+      setPlaybackStatus("");
+      updateTriadPlaybackControls();
+    },
+    onError: playbackError
+  });
+  updateTriadPlaybackControls();
 }
 
 function renderChordLibrary() {
@@ -1882,6 +1977,7 @@ function populateTuningOptions() {
 
 function bindEvents() {
   bindIfPresent(els.playbackTempo, "change", (event) => {
+    stopPlayback();
     const tempo = Number.parseInt(event.target.value, 10);
     playbackState.tempo = Math.max(40, Math.min(240, Number.isFinite(tempo) ? tempo : 100));
     event.target.value = String(playbackState.tempo);
@@ -1892,6 +1988,11 @@ function bindEvents() {
     if (playbackState.kind === "chord") stopPlayback();
     else playCurrentChord();
   });
+  bindIfPresent(els.playCurrentTriad, "click", () => {
+    if (playbackState.kind === "triad") stopPlayback();
+    else playCurrentTriad();
+  });
+  bindIfPresent(els.stopTriadPlayback, "click", stopPlayback);
 
   bindIfPresent(els.instrumentSelect, "change", (event) => {
     state.instrument = event.target.value;
@@ -2121,6 +2222,8 @@ function cacheElements() {
     "nextTriadShape",
     "revealTriadShape",
     "newTriadExercise",
+    "playCurrentTriad",
+    "stopTriadPlayback",
     "applySuggestions",
     "clearVocabulary",
     "progressionSummary",
