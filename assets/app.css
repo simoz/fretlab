@@ -446,6 +446,15 @@ body {
   border-left-color: #58606b;
 }
 
+.fret-cell.is-unavailable {
+  border-left-color: transparent;
+  background: #f2f4f7;
+}
+
+.fret-cell.is-unavailable::before {
+  content: none;
+}
+
 .fret-cell::before {
   content: "";
   position: absolute;
@@ -987,6 +996,11 @@ body {
   border-left-color: #101113;
 }
 
+.diagram-cell.is-unavailable {
+  border-left-color: transparent;
+  background: #f2f4f7;
+}
+
 .diagram-status-cell::before,
 .diagram-cell::before {
   position: absolute;
@@ -997,6 +1011,10 @@ body {
   content: "";
   background: var(--string);
   transform: translateY(-50%);
+}
+
+.diagram-cell.is-unavailable::before {
+  content: none;
 }
 
 .diagram-cell.has-marker::after {

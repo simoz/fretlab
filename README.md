@@ -138,6 +138,13 @@ Banjo tunings:
 - Double D
 - Open D
 
+Ukulele tunings:
+
+- Standard (GCEA)
+- Low G (GCEA)
+- D tuning (ADF#B)
+- Baritone (DGBE)
+
 ## Project Layout
 
 - `index.html` - scales tool

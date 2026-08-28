@@ -891,6 +891,10 @@ const INSTRUMENTS = {
   banjo: {
     label: "Banjo",
     defaultTuning: "openG"
+  },
+  ukulele: {
+    label: "Ukulele",
+    defaultTuning: "standard"
   }
 };
 
@@ -983,37 +987,59 @@ const TUNINGS = {
     openG: {
       label: "Open G",
       summary: "5-string Open G tuning, high G drone on top.",
-      tuning: notes("G", "D", "B", "G", "D")
+      tuning: notes({ label: "G", startFret: 5 }, "D", "B", "G", "D")
     },
     gMinor: {
       label: "G Minor",
       summary: "5-string G Minor tuning, high G drone on top.",
-      tuning: notes("G", "D", "Bb", "G", "D")
+      tuning: notes({ label: "G", startFret: 5 }, "D", "Bb", "G", "D")
     },
     cTuning: {
       label: "C tuning",
       summary: "5-string C tuning, high G drone on top.",
-      tuning: notes("G", "D", "B", "G", "C")
+      tuning: notes({ label: "G", startFret: 5 }, "D", "B", "G", "C")
     },
     doubleC: {
       label: "Double C",
       summary: "5-string Double C tuning, high G drone on top.",
-      tuning: notes("G", "D", "C", "G", "C")
+      tuning: notes({ label: "G", startFret: 5 }, "D", "C", "G", "C")
     },
     sawmill: {
       label: "Sawmill",
       summary: "5-string Sawmill tuning, high G drone on top.",
-      tuning: notes("G", "D", "C", "G", "D")
+      tuning: notes({ label: "G", startFret: 5 }, "D", "C", "G", "D")
     },
     doubleD: {
       label: "Double D",
       summary: "5-string Double D tuning, high A drone on top.",
-      tuning: notes("A", "E", "D", "A", "D")
+      tuning: notes({ label: "A", startFret: 5 }, "E", "D", "A", "D")
     },
     openD: {
       label: "Open D",
       summary: "5-string Open D tuning, high F# drone on top.",
-      tuning: notes("F#", "D", "A", "F#", "D")
+      tuning: notes({ label: "F#", startFret: 5 }, "D", "A", "F#", "D")
+    }
+  },
+  ukulele: {
+    standard: {
+      label: "Standard (GCEA)",
+      summary: "Standard C tuning, high A on top.",
+      tuning: notes("A", "E", "C", "G")
+    },
+    lowG: {
+      label: "Low G (GCEA)",
+      summary: "Low G tuning, high A on top.",
+      tuning: notes("A", "E", "C", "G")
+    },
+    dTuning: {
+      label: "D tuning (ADF#B)",
+      summary: "D tuning, high B on top.",
+      tuning: notes("B", "F#", "D", "A")
+    },
+    baritone: {
+      label: "Baritone (DGBE)",
+      summary: "Baritone tuning, high E on top.",
+      tuning: notes("E", "B", "G", "D")
     }
   }
 };
@@ -1063,8 +1089,11 @@ function bar(degree, quality, roman) {
   return { degree, quality, roman };
 }
 
-function notes(...labels) {
-  return labels.map((label) => ({ label, pc: notePcFromLabel(label) }));
+function notes(...values) {
+  return values.map((value) => {
+    const string = typeof value === "string" ? { label: value } : value;
+    return { ...string, pc: notePcFromLabel(string.label) };
+  });
 }
 
 function notePcFromLabel(label) {

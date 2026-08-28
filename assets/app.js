@@ -323,8 +323,8 @@ function triadShapes(chord = triadForSelection()) {
   const strings = currentTuning().tuning.slice(group.startIndex, group.startIndex + 3);
   const candidates = strings.map((string) => {
     const matches = [];
-    for (let fret = range.start; fret <= range.end; fret += 1) {
-      const tone = chordToneForPc(chord, pc(string.pc + fret));
+    for (let fret = Math.max(range.start, stringStartFret(string)); fret <= range.end; fret += 1) {
+      const tone = chordToneForPc(chord, stringPcAtFret(string, fret));
       if (tone) matches.push({ fret, pc: tone.pc, role: tone.role });
     }
     return matches;
@@ -430,6 +430,14 @@ function chordToneForPc(chord, notePc) {
   return chord.tones.find((tone) => tone.pc === notePc);
 }
 
+function stringStartFret(string) {
+  return string.startFret || 0;
+}
+
+function stringPcAtFret(string, fret) {
+  return pc(string.pc + fret - stringStartFret(string));
+}
+
 function chordTabFor(chord) {
   const tuning = currentTuning();
   const range = voicingFretRange();
@@ -438,8 +446,8 @@ function chordTabFor(chord) {
   const candidateLists = tuning.tuning.map((string) => {
     const candidates = [];
 
-    for (let fret = range.start; fret <= range.end; fret += 1) {
-      const tone = chordToneForPc(chord, pc(string.pc + fret));
+    for (let fret = Math.max(range.start, stringStartFret(string)); fret <= range.end; fret += 1) {
+      const tone = chordToneForPc(chord, stringPcAtFret(string, fret));
       if (tone) {
         candidates.push({
           fret,
@@ -653,8 +661,8 @@ function chordLibraryVoicings(chord) {
     const candidateLists = tuning.tuning.map((string) => {
       const candidates = [];
 
-      for (let fret = windowRange.start; fret <= windowRange.end; fret += 1) {
-        const tone = chordToneForPc(chord, pc(string.pc + fret));
+      for (let fret = Math.max(windowRange.start, stringStartFret(string)); fret <= windowRange.end; fret += 1) {
+        const tone = chordToneForPc(chord, stringPcAtFret(string, fret));
         if (tone) {
           candidates.push({
             fret,
@@ -994,17 +1002,27 @@ function renderFretboard() {
     els.fretboard.append(stringLabel);
 
     if (hasOpenStrings) {
-      els.fretboard.append(renderFretCell(string, 0, chord, true, false, stringIndex));
+      els.fretboard.append(stringStartFret(string) === 0
+        ? renderFretCell(string, 0, chord, true, false, stringIndex)
+        : renderUnavailableFretCell());
     }
 
     for (let fret = firstFretted; fret <= fretRange.end; fret += 1) {
-      els.fretboard.append(renderFretCell(string, fret, chord, false, hasOpenStrings && fret === firstFretted, stringIndex));
+      els.fretboard.append(fret < stringStartFret(string)
+        ? renderUnavailableFretCell()
+        : renderFretCell(string, fret, chord, false, (hasOpenStrings && fret === firstFretted) || fret === stringStartFret(string), stringIndex));
     }
   });
 }
 
+function renderUnavailableFretCell() {
+  const cell = document.createElement("div");
+  cell.className = "fret-cell is-unavailable";
+  return cell;
+}
+
 function renderFretCell(string, fret, chord, isOpenString, isNutAdjacent, stringIndex) {
-  const notePc = pc(string.pc + fret);
+  const notePc = stringPcAtFret(string, fret);
   const info = triadTrainerCellInfo(noteInfo(notePc, chord), stringIndex, fret);
   const cell = document.createElement("div");
   const markerClass = !isOpenString && FRET_MARKERS.has(fret) ? ` has-marker fret-marker-${fret}` : "";
@@ -1259,7 +1277,8 @@ function renderChordDiagram(voicing) {
 
     frets.forEach((fret) => {
       const cell = document.createElement("div");
-      cell.className = `diagram-cell${startFret === 1 && fret === 1 ? " is-nut-adjacent" : ""}${FRET_MARKERS.has(fret) && stringIndex === markerStringIndex ? " has-marker" : ""}`;
+      const unavailable = fret < stringStartFret(string);
+      cell.className = `diagram-cell${unavailable ? " is-unavailable" : ""}${(startFret === 1 && fret === 1) || fret === stringStartFret(string) ? " is-nut-adjacent" : ""}${FRET_MARKERS.has(fret) && stringIndex === markerStringIndex ? " has-marker" : ""}`;
       if (string.item.fret === fret) {
         cell.append(renderDiagramDot(string.item));
       }
