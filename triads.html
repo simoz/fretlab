@@ -148,15 +148,33 @@
                 </div>
               </div>
 
+              <div id="triadShapeNavigation" class="triad-shape-navigation mt-3" hidden>
+                <button id="previousTriadShape" class="btn btn-outline-secondary triad-shape-nav-button" type="button" aria-label="Previous triad shape">‹</button>
+                <div class="triad-shape-navigation-copy">
+                  <span>Shape</span>
+                  <strong id="triadShapeNavigationStatus">1 of 1</strong>
+                  <small id="triadShapeRange"></small>
+                </div>
+                <button id="nextTriadShape" class="btn btn-outline-secondary triad-shape-nav-button" type="button" aria-label="Next triad shape">›</button>
+              </div>
+
               <div class="triad-trainer-actions mt-3">
-                <button id="previousTriadShape" class="btn btn-outline-secondary" type="button">Previous shape</button>
-                <button id="nextTriadShape" class="btn btn-outline-secondary" type="button">Next shape</button>
                 <button id="revealTriadShape" class="btn btn-dark" type="button">Show solution</button>
                 <button id="newTriadExercise" class="btn btn-outline-dark" type="button">New exercise</button>
-                <button id="playCurrentTriad" class="btn btn-primary playback-button" type="button" aria-label="Play current triad" aria-pressed="false">▶ Play</button>
-                <button id="stopTriadPlayback" class="btn btn-outline-secondary playback-button" type="button" aria-label="Stop triad playback" disabled>■ Stop</button>
               </div>
-              <p id="playbackStatus" class="playback-status" role="status" aria-live="polite"></p>
+
+              <div class="triad-playback-box">
+                <div class="triad-playback-copy">
+                  <span>Listen</span>
+                  <strong id="triadPlaybackTitle">Triad arpeggio</strong>
+                  <p id="playbackStatus" class="playback-status" role="status" aria-live="polite"></p>
+                </div>
+                <div class="triad-playback-controls">
+                  <label for="playbackTempo">Tempo</label>
+                  <input id="playbackTempo" type="number" min="40" max="240" step="1" value="100" aria-label="Tempo in beats per minute">
+                  <button id="playCurrentTriad" class="btn btn-primary playback-button" type="button" aria-label="Play current triad" aria-pressed="false">▶ Play triad</button>
+                </div>
+              </div>
             </section>
           </div>
 

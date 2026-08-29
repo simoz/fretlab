@@ -368,7 +368,6 @@ function updateProgressionPlaybackControls() {
   els.playProgression.textContent = isPlaying ? "■ Stop" : "▶ Play";
   els.playProgression.setAttribute("aria-pressed", String(isPlaying));
   els.playProgression.setAttribute("aria-label", `${isPlaying ? "Stop" : "Play"} progression`);
-  if (els.stopProgressionPlayback) els.stopProgressionPlayback.disabled = !isPlaying;
 }
 
 function playProgression() {
@@ -1458,17 +1457,28 @@ function updateTriadPlaybackControls() {
   const concealedQuiz = state.triadStudyMode === "quiz" && !state.triadExerciseRevealed;
   const isPlaying = playbackState.kind === "triad";
   const hasEvents = playableTriadEvents().length > 0;
+  const isMap = state.triadStudyMode === "map";
   els.playCurrentTriad.disabled = concealedQuiz || !hasEvents;
-  els.playCurrentTriad.textContent = isPlaying ? "■ Stop" : "▶ Play";
+  els.playCurrentTriad.textContent = isPlaying
+    ? "■ Stop"
+    : concealedQuiz
+      ? "Reveal to play"
+      : `▶ Play ${isMap ? "triad" : "shape"}`;
   els.playCurrentTriad.setAttribute("aria-pressed", String(isPlaying));
-  const shape = state.triadStudyMode === "map" ? null : currentTriadShape();
+  const shape = isMap ? null : currentTriadShape();
   const group = currentTriadStringGroup();
   const inversion = ["root position", "1st inversion", "2nd inversion"][state.triadInversion];
-  const source = state.triadStudyMode === "map"
+  const source = isMap
     ? "triad map"
     : `shape ${shape ? state.triadShapeIndex + 1 : "unavailable"}, ${group?.label || "selected strings"}, ${inversion}`;
-  els.playCurrentTriad.setAttribute("aria-label", `${isPlaying ? "Stop" : "Play"} ${source} in ${currentKey().label}`);
-  if (els.stopTriadPlayback) els.stopTriadPlayback.disabled = !isPlaying;
+  els.playCurrentTriad.setAttribute("aria-label", concealedQuiz
+    ? "Reveal the quiz solution before playback"
+    : `${isPlaying ? "Stop" : "Play"} ${source} in ${currentKey().label}`);
+  setText("triadPlaybackTitle", concealedQuiz
+    ? "Reveal the solution to listen"
+    : isMap
+      ? `${currentChord().name} · Root, third, fifth`
+      : `${currentChord().name} · Shape ${shape ? state.triadShapeIndex + 1 : "unavailable"} · ${inversion}`);
 }
 
 function playCurrentTriad() {
@@ -1743,13 +1753,17 @@ function renderTriadTrainer() {
   if (!els.triadStudyMode) return;
 
   const shapes = triadShapes();
-  const shapeNumber = shapes.length ? state.triadShapeIndex + 1 : 0;
   const group = currentTriadStringGroup();
   const inversion = ["root position", "1st inversion", "2nd inversion"][state.triadInversion];
   const isMap = state.triadStudyMode === "map";
   const isQuiz = state.triadStudyMode === "quiz";
+  const shape = isMap ? null : currentTriadShape();
+  const shapeNumber = shape ? state.triadShapeIndex + 1 : 0;
+  const shapeFrets = shape?.notes.map((note) => note.fret) || [];
 
-  setText("triadShapeCount", isMap ? "Map" : `${shapeNumber} / ${shapes.length}`);
+  setText("triadShapeCount", isMap ? "Map" : isQuiz ? "Quiz" : "Shape");
+  setText("triadShapeNavigationStatus", shapes.length < 2 ? "Only shape in this fret range" : `${shapeNumber} of ${shapes.length}`);
+  setText("triadShapeRange", shapeFrets.length ? `Frets ${Math.min(...shapeFrets)}–${Math.max(...shapeFrets)}` : "No shape available");
   setText("triadTrainerPrompt", isQuiz
     ? `Find ${currentChord().name}, ${inversion}, on ${group?.label.toLowerCase() || "the selected strings"}.`
     : isMap
@@ -1758,8 +1772,8 @@ function renderTriadTrainer() {
         ? `${currentChord().name}, ${inversion}, ${group.label.toLowerCase()}. Move through the compact shapes along the neck.`
         : "No compact shape is available in the selected fret range.");
 
-  els.previousTriadShape.hidden = isMap || isQuiz;
-  els.nextTriadShape.hidden = isMap || isQuiz;
+  els.triadShapeNavigation.hidden = isMap || isQuiz;
+  els.triadShapeNavigation.classList.toggle("is-single", shapes.length < 2);
   els.revealTriadShape.hidden = !isQuiz;
   els.newTriadExercise.hidden = !isQuiz;
   els.revealTriadShape.textContent = state.triadExerciseRevealed ? "Hide solution" : "Show solution";
@@ -2071,7 +2085,6 @@ function bindEvents() {
     event.target.value = String(playbackState.tempo);
   });
 
-  bindIfPresent(els.stopProgressionPlayback, "click", () => stopPlayback({ restoreBar: true }));
   bindIfPresent(els.playProgression, "click", () => {
     if (playbackState.kind === "progression") stopPlayback({ restoreBar: true });
     else playProgression();
@@ -2084,8 +2097,6 @@ function bindEvents() {
     if (playbackState.kind === "triad") stopPlayback();
     else playCurrentTriad();
   });
-  bindIfPresent(els.stopTriadPlayback, "click", stopPlayback);
-
   bindIfPresent(els.instrumentSelect, "change", (event) => {
     stopPlayback();
     state.instrument = event.target.value;
@@ -2232,13 +2243,17 @@ function bindEvents() {
   });
 
   bindIfPresent(els.previousTriadShape, "click", () => {
-    state.triadShapeIndex -= 1;
+    const shapes = triadShapes();
+    if (shapes.length < 2) return;
+    state.triadShapeIndex = (state.triadShapeIndex - 1 + shapes.length) % shapes.length;
     saveState();
     render();
   });
 
   bindIfPresent(els.nextTriadShape, "click", () => {
-    state.triadShapeIndex += 1;
+    const shapes = triadShapes();
+    if (shapes.length < 2) return;
+    state.triadShapeIndex = (state.triadShapeIndex + 1) % shapes.length;
     saveState();
     render();
   });
@@ -2320,12 +2335,15 @@ function cacheElements() {
     "triadTrainerLabels",
     "triadTrainerPrompt",
     "triadShapeCount",
+    "triadShapeNavigation",
+    "triadShapeNavigationStatus",
+    "triadShapeRange",
     "previousTriadShape",
     "nextTriadShape",
     "revealTriadShape",
     "newTriadExercise",
     "playCurrentTriad",
-    "stopTriadPlayback",
+    "triadPlaybackTitle",
     "applySuggestions",
     "clearVocabulary",
     "progressionSummary",
@@ -2357,7 +2375,6 @@ function cacheElements() {
     "rootFifthList",
     "playbackTempo",
     "playProgression",
-    "stopProgressionPlayback",
     "playCurrentChord",
     "playbackStatus"
   ].forEach((id) => {

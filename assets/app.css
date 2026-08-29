@@ -688,6 +688,115 @@ body {
   gap: .5rem;
 }
 
+.triad-shape-navigation {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .75rem;
+  padding: .65rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--app-bg);
+}
+
+.triad-shape-navigation[hidden] {
+  display: none;
+}
+
+.triad-shape-nav-button {
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.triad-shape-navigation.is-single .triad-shape-nav-button {
+  visibility: hidden;
+}
+
+.triad-shape-navigation-copy {
+  min-width: 0;
+  text-align: center;
+}
+
+.triad-shape-navigation-copy span,
+.triad-shape-navigation-copy small {
+  display: block;
+  color: var(--muted);
+  font-size: .68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.triad-shape-navigation-copy strong {
+  display: block;
+  margin: .1rem 0;
+  font-size: .9rem;
+}
+
+.triad-playback-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: .85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--app-bg);
+}
+
+.triad-playback-copy {
+  min-width: 0;
+}
+
+.triad-playback-copy > span,
+.triad-playback-controls label {
+  display: block;
+  color: var(--muted);
+  font-size: .7rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.triad-playback-copy strong {
+  display: block;
+  margin-top: .15rem;
+  font-size: .92rem;
+}
+
+.triad-playback-box .playback-status {
+  margin: .2rem 0 0;
+}
+
+.triad-playback-controls {
+  display: grid;
+  grid-template-columns: 4.5rem auto;
+  align-items: end;
+  gap: .5rem;
+  flex: 0 0 auto;
+}
+
+.triad-playback-controls label {
+  grid-column: 1;
+}
+
+.triad-playback-controls input {
+  grid-column: 1;
+  width: 4.5rem;
+  padding: .45rem .5rem;
+  border: 1px solid #8c96a5;
+  border-radius: 8px;
+  font-size: .8rem;
+}
+
+.triad-playback-controls .playback-button {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  min-height: 2.45rem;
+}
+
 .note-marker.triad:empty::after {
   content: "";
   width: .42rem;
@@ -1405,6 +1514,15 @@ body {
 }
 
 @media (max-width: 575.98px) {
+  .triad-playback-box {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .triad-playback-controls {
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+  }
+
   .playback-controls {
     align-items: stretch;
     gap: .5rem;
