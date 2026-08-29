@@ -153,7 +153,10 @@
                 <button id="nextTriadShape" class="btn btn-outline-secondary" type="button">Next shape</button>
                 <button id="revealTriadShape" class="btn btn-dark" type="button">Show solution</button>
                 <button id="newTriadExercise" class="btn btn-outline-dark" type="button">New exercise</button>
+                <button id="playCurrentTriad" class="btn btn-primary playback-button" type="button" aria-label="Play current triad" aria-pressed="false">▶ Play</button>
+                <button id="stopTriadPlayback" class="btn btn-outline-secondary playback-button" type="button" aria-label="Stop triad playback" disabled>■ Stop</button>
               </div>
+              <p id="playbackStatus" class="playback-status" role="status" aria-live="polite"></p>
             </section>
           </div>
 
@@ -226,6 +229,7 @@
     </main>
 
     <script src="assets/data.js" defer></script>
+    <script src="assets/audio.js" defer></script>
     <script src="assets/app.js" defer></script>
   </body>
 </html>

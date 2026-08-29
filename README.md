@@ -35,13 +35,16 @@ Then open `http://localhost:8000/`.
 - Position filters: full range, open position, low box, middle box, upper box, octave box, and high range.
 - Browser-local state persistence through `localStorage`.
 - Local Bootstrap-based controls with custom fretboard styling.
+- Browser playback for individual fretboard notes, scales, chord voicings, triad shapes, and full progressions through the Web Audio API.
 - Metronome with 30-300 BPM range, tap tempo, configurable beats per bar, and first-beat accent.
+
+Playback starts only after a user gesture, as required by current browser audio policies. It works in browsers that provide Web Audio (including current desktop Chrome, Edge, Firefox, and Safari); browsers without Web Audio support show an in-app status message instead of failing silently. FretLab has no backend and requires no external runtime dependency.
 
 ## Tools
 
 ### Scales
 
-The scales page lets you combine multiple key-relative scale layers on the same fretboard. The default view highlights minor blues, and an active scale palette shows the notes and interval roles for selected layers. Each palette entry can play the scale ascending and descending from the selected key.
+The scales page lets you combine multiple key-relative scale layers on the same fretboard. The default view highlights minor blues, and an active scale palette shows the notes and interval roles for selected layers. Each palette entry can play the scale ascending and descending from the selected key. Any available individual fretboard note can also be clicked or keyboard-activated to hear its pitch.
 
 Included scale families:
 
@@ -53,7 +56,7 @@ Included scale families:
 
 ### Progressions
 
-The progressions page combines a progression selector, family filter, interactive bar grid, current-chord details, fretboard layers, focus modes, and chord-relative vocabulary suggestions.
+The progressions page combines a progression selector, family filter, interactive bar grid, current-chord details, fretboard layers, focus modes, and chord-relative vocabulary suggestions. Use its playback controls to hear the selected progression with the active tempo and see the current bar advance.
 
 Fretboard layers:
 
@@ -77,7 +80,7 @@ Suggested vocabulary includes the current triad, major/minor/diminished/augmente
 
 ### Triads
 
-The triads page maps a selected root and triad quality across the fretboard, with an optional filter for three-string groups. Its trainer can isolate compact shapes by string group and inversion, hide their labels, or generate random exercises with a concealed solution.
+The triads page maps a selected root and triad quality across the fretboard, with an optional filter for three-string groups. Its trainer can isolate compact shapes by string group and inversion, hide their labels, or generate random exercises with a concealed solution. Visible map tones and revealed trainer shapes are playable as ordered arpeggios; concealed quiz solutions remain unavailable.
 
 Included triad qualities:
 
@@ -91,6 +94,8 @@ Available layers are triad tones and root + fifth, with focus modes for all acti
 ### Chords
 
 The chords page generates practical chord voicings for the selected instrument, tuning, root, chord type, fret range, and position. Voicings are grouped by the lowest sounding chord tone so root position and every available inversion can be selected directly.
+
+The selected chord voicing can be played as simultaneous tones from the current-chord panel.
 
 Included chord types:
 

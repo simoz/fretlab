@@ -101,14 +101,18 @@ const state = {
   vocabulary: { ...DEFAULT_VOCABULARY }
 };
 
-const scalePlaybackState = {
-  audioContext: null,
-  scaleKey: null,
+const playbackState = {
+  player: null,
+  kind: null,
   keyIndex: null,
-  sources: new Set(),
-  timerId: null,
-  playbackId: 0
+  tempo: 100,
+  token: 0,
+  scaleKey: null,
+  error: null,
+  previousBar: null
 };
+const playingCells = new Set();
+let selectedChordVoicing = null;
 
 const els = {};
 
@@ -143,6 +147,62 @@ function setText(id, text) {
 
 function bindIfPresent(element, eventName, handler) {
   if (element) element.addEventListener(eventName, handler);
+}
+
+function playbackPlayer() {
+  if (!playbackState.player && window.FretLabAudio) {
+    playbackState.player = window.FretLabAudio.createPlayer();
+  }
+  return playbackState.player;
+}
+
+function clearPlayingCells() {
+  playingCells.forEach((cell) => cell.classList.remove("is-playing"));
+  playingCells.clear();
+}
+
+function setPlaybackStatus(message = "") {
+  setText("playbackStatus", message);
+}
+
+function stopPlayback({ restoreBar = true } = {}) {
+  const wasProgression = playbackState.kind === "progression";
+  const previousBar = playbackState.previousBar;
+  const shouldRestoreBar = restoreBar && wasProgression && Number.isInteger(previousBar);
+  playbackState.token += 1;
+  playbackPlayer()?.stop();
+  playbackState.kind = null;
+  playbackState.keyIndex = null;
+  playbackState.scaleKey = null;
+  playbackState.previousBar = null;
+  playbackState.error = null;
+  if (shouldRestoreBar) {
+    state.currentBar = Math.min(previousBar, currentProgression().bars.length - 1);
+    saveState();
+  }
+  clearPlayingCells();
+  setPlaybackStatus("");
+  updateScalePlayButtons();
+  updateChordPlaybackControls();
+  updateTriadPlaybackControls();
+  updateProgressionPlaybackControls();
+  if (shouldRestoreBar) {
+    renderProgression();
+    renderFretboard();
+    renderDetails();
+  }
+}
+
+function playbackError(error) {
+  playbackState.error = error;
+  playbackState.kind = null;
+  playbackState.scaleKey = null;
+  clearPlayingCells();
+  setPlaybackStatus(error?.message || "Audio playback is unavailable.");
+  updateScalePlayButtons();
+  updateChordPlaybackControls();
+  updateTriadPlaybackControls();
+  updateProgressionPlaybackControls();
 }
 
 function pc(value) {
@@ -287,6 +347,79 @@ function chordForBar(barData) {
     tones,
     targets: tones.filter((tone) => tone.target)
   };
+}
+
+function playableProgressionEvents() {
+  const progression = currentProgression();
+  const barDuration = 240 / playbackState.tempo;
+  const rootMidiFor = (rootPc) => 60 + rootPc;
+
+  return progression.bars.flatMap((barData, barIndex) => {
+    const chord = chordForBar(barData);
+    const rootMidi = rootMidiFor(chord.rootPc);
+    return chord.tones.map((tone) => ({
+      midi: rootMidi + tone.interval,
+      start: barIndex * barDuration,
+      duration: barDuration * 0.9,
+      velocity: 0.8,
+      barIndex
+    }));
+  });
+}
+
+function updateProgressionPlaybackControls() {
+  if (!els.playProgression) return;
+  const isPlaying = playbackState.kind === "progression";
+  els.playProgression.textContent = isPlaying ? "■ Stop" : "▶ Play";
+  els.playProgression.setAttribute("aria-pressed", String(isPlaying));
+  els.playProgression.setAttribute("aria-label", `${isPlaying ? "Stop" : "Play"} progression`);
+  if (els.stopProgressionPlayback) els.stopProgressionPlayback.disabled = !isPlaying;
+}
+
+function playProgression() {
+  const events = playableProgressionEvents();
+  if (!events.length) {
+    setPlaybackStatus("Cannot play an empty progression.");
+    updateProgressionPlaybackControls();
+    return;
+  }
+  const player = playbackPlayer();
+  if (!player) {
+    playbackError(new Error("Audio playback is unavailable."));
+    return;
+  }
+
+  stopPlayback();
+  const token = playbackState.token;
+  playbackState.kind = "progression";
+  playbackState.keyIndex = state.keyIndex;
+  playbackState.previousBar = state.currentBar;
+  state.currentBar = 0;
+  renderProgression();
+  renderFretboard();
+  renderDetails();
+  setPlaybackStatus(`Playing ${currentProgression().label} in ${currentKey().label}.`);
+  player.play(events, {
+    onEvent: (event) => {
+      if (token !== playbackState.token || playbackState.kind !== "progression") return;
+      if (!Number.isInteger(event.barIndex) || event.barIndex === state.currentBar) return;
+      state.currentBar = event.barIndex;
+      saveState();
+      renderProgression();
+      renderFretboard();
+      renderDetails();
+      setPlaybackStatus(`Playing ${currentProgression().label}: bar ${event.barIndex + 1}.`);
+    },
+    onEnd: () => {
+      if (token !== playbackState.token) return;
+      // Explicit stops and natural completion both restore the bar selected before playback.
+      stopPlayback({ restoreBar: true });
+    },
+    onError: (error) => {
+      if (token === playbackState.token) playbackError(error);
+    }
+  });
+  updateProgressionPlaybackControls();
 }
 
 function triadForSelection() {
@@ -541,8 +674,12 @@ function chordTabMarkup(chord) {
   `;
 }
 
-function stringBasePitchesHighToLow(strings) {
+function stringBasePitchesHighToLow(strings, openMidi) {
   if (!strings.length) return [];
+
+  if (Array.isArray(openMidi) && openMidi.length === strings.length) {
+    return openMidi.map((midi, index) => midi - stringStartFret(strings[index]));
+  }
 
   const pitches = [60 + strings[0].pc];
   for (let index = 1; index < strings.length; index += 1) {
@@ -552,6 +689,13 @@ function stringBasePitchesHighToLow(strings) {
   }
 
   return pitches;
+}
+
+function stringMidiAtFret(string, fret, stringIndex, tuning) {
+  if (Array.isArray(tuning.openMidi) && Number.isFinite(tuning.openMidi[stringIndex])) {
+    return tuning.openMidi[stringIndex] + fret - stringStartFret(string);
+  }
+  return stringBasePitchesHighToLow(tuning.tuning)[stringIndex] + fret;
 }
 
 function chordLibraryWindows(range, maxStretch) {
@@ -661,7 +805,7 @@ function scoreChordLibraryVoicing(voicing, chord, stringPitches, maxStretch) {
 function chordLibraryVoicings(chord) {
   const tuning = currentTuning();
   const range = visibleFretRange();
-  const stringPitches = stringBasePitchesHighToLow(tuning.tuning);
+  const stringPitches = stringBasePitchesHighToLow(tuning.tuning, tuning.openMidi);
   const maxStretch = chordLibraryMaxStretch(tuning.tuning.length);
   const windows = chordLibraryWindows(range, maxStretch);
   const voicings = new Map();
@@ -959,6 +1103,7 @@ function renderProgression() {
       ${chordTabMarkup(chord)}
     `;
     button.addEventListener("click", () => {
+      stopPlayback();
       state.currentBar = index;
       saveState();
       render();
@@ -1037,6 +1182,17 @@ function renderFretCell(string, fret, chord, isOpenString, isNutAdjacent, string
   const markerClass = !isOpenString && FRET_MARKERS.has(fret) ? ` has-marker fret-marker-${fret}` : "";
   cell.className = `fret-cell${isOpenString ? " is-open-string" : ""}${isNutAdjacent ? " is-nut-adjacent" : ""}${markerClass}`;
   cell.dataset.note = noteName(notePc);
+  cell.tabIndex = 0;
+  cell.setAttribute("role", "button");
+  cell.setAttribute("aria-label", `${noteName(notePc)} at fret ${fret} on ${string.label}`);
+  const playNote = () => playSingleNote(string, fret, cell);
+  cell.addEventListener("click", playNote);
+  cell.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      playNote();
+    }
+  });
 
   if (info) {
     const marker = document.createElement("span");
@@ -1048,6 +1204,33 @@ function renderFretCell(string, fret, chord, isOpenString, isNutAdjacent, string
   }
 
   return cell;
+}
+
+function playSingleNote(string, fret, cell) {
+  const player = playbackPlayer();
+  if (!player) {
+    playbackError(new Error("Audio playback is unavailable."));
+    return;
+  }
+  stopPlayback();
+  clearPlayingCells();
+  cell.classList.add("is-playing");
+  playingCells.add(cell);
+  playbackState.kind = "note";
+  playbackState.keyIndex = state.keyIndex;
+  setPlaybackStatus(`Playing ${noteName(stringPcAtFret(string, fret))}.`);
+  const current = currentTuning();
+  const stringIndex = current.tuning.indexOf(string);
+  const midi = stringMidiAtFret(string, fret, stringIndex, current);
+  player.play([{ midi, start: 0, duration: 0.45, velocity: 0.9 }], {
+    onEnd: () => {
+      cell.classList.remove("is-playing");
+      playingCells.delete(cell);
+      playbackState.kind = null;
+      setPlaybackStatus("");
+    },
+    onError: playbackError
+  });
 }
 
 function renderDetails() {
@@ -1079,10 +1262,6 @@ function renderScalePalette() {
   if (!els.scalePaletteList) return;
 
   const shouldShowPalette = hasActiveScaleLayer();
-  const activeScaleStillVisible = scalePlaybackState.scaleKey
-    && isLayerActive(scalePlaybackState.scaleKey)
-    && scalePlaybackState.keyIndex === state.keyIndex;
-  if (scalePlaybackState.scaleKey && !activeScaleStillVisible) stopScalePlayback();
   if (els.scalePalettePanel) els.scalePalettePanel.hidden = !shouldShowPalette;
   if (!shouldShowPalette) {
     els.scalePaletteList.innerHTML = "";
@@ -1112,9 +1291,9 @@ function renderScalePalette() {
     playButton.type = "button";
     playButton.className = "scale-play-button";
     playButton.dataset.scalePlay = scaleKey;
-    playButton.textContent = scalePlaybackState.scaleKey === scaleKey ? "■ Stop" : "▶ Play";
-    playButton.setAttribute("aria-label", `${scalePlaybackState.scaleKey === scaleKey ? "Stop" : "Play"} ${scale.label} in ${currentKey().label}`);
-    playButton.setAttribute("aria-pressed", String(scalePlaybackState.scaleKey === scaleKey));
+    playButton.textContent = playbackState.scaleKey === scaleKey ? "■ Stop" : "▶ Play";
+    playButton.setAttribute("aria-label", `${playbackState.scaleKey === scaleKey ? "Stop" : "Play"} ${scale.label} in ${currentKey().label}`);
+    playButton.setAttribute("aria-pressed", String(playbackState.scaleKey === scaleKey));
     playButton.addEventListener("click", () => toggleScalePlayback(scaleKey));
     appendToneItems(notes, scaleNotes(scaleKey));
     header.append(label, playButton);
@@ -1123,84 +1302,210 @@ function renderScalePalette() {
   });
 }
 
-function scaleAudioContext() {
-  if (!scalePlaybackState.audioContext) {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    scalePlaybackState.audioContext = new AudioContextClass();
-  }
-  return scalePlaybackState.audioContext;
-}
-
-function scheduleScaleNote(context, midiNote, startAt, duration) {
-  const oscillator = context.createOscillator();
-  const gain = context.createGain();
-  const frequency = 440 * (2 ** ((midiNote - 69) / 12));
-
-  oscillator.type = "triangle";
-  oscillator.frequency.setValueAtTime(frequency, startAt);
-  gain.gain.setValueAtTime(0.0001, startAt);
-  gain.gain.exponentialRampToValueAtTime(0.22, startAt + 0.015);
-  gain.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
-  oscillator.connect(gain);
-  gain.connect(context.destination);
-  oscillator.addEventListener("ended", () => scalePlaybackState.sources.delete(oscillator));
-  scalePlaybackState.sources.add(oscillator);
-  oscillator.start(startAt);
-  oscillator.stop(startAt + duration);
-}
-
 function updateScalePlayButtons() {
   document.querySelectorAll("[data-scale-play]").forEach((button) => {
     const scale = SCALES[button.dataset.scalePlay];
-    const playing = button.dataset.scalePlay === scalePlaybackState.scaleKey;
+    const playing = button.dataset.scalePlay === playbackState.scaleKey;
     button.textContent = playing ? "■ Stop" : "▶ Play";
     button.setAttribute("aria-label", `${playing ? "Stop" : "Play"} ${scale.label} in ${currentKey().label}`);
     button.setAttribute("aria-pressed", String(playing));
   });
 }
 
-function stopScalePlayback(updateButtons = true) {
-  scalePlaybackState.playbackId += 1;
-  window.clearTimeout(scalePlaybackState.timerId);
-  scalePlaybackState.timerId = null;
-  scalePlaybackState.sources.forEach((source) => source.stop());
-  scalePlaybackState.sources.clear();
-  scalePlaybackState.scaleKey = null;
-  scalePlaybackState.keyIndex = null;
-  if (updateButtons) updateScalePlayButtons();
-}
-
-async function playScale(scaleKey) {
-  stopScalePlayback(false);
-  const playbackId = scalePlaybackState.playbackId;
-  const context = scaleAudioContext();
-  await context.resume();
-  if (playbackId !== scalePlaybackState.playbackId) return;
-
+function playScale(scaleKey) {
+  const player = playbackPlayer();
+  if (!player) {
+    playbackError(new Error("Audio playback is unavailable."));
+    return;
+  }
+  stopPlayback();
   const scale = SCALES[scaleKey];
-  const intervals = [...scale.intervals, 12, ...scale.intervals.slice(1).reverse(), 0];
-  const stepDuration = 0.3;
-  const firstNoteAt = context.currentTime + 0.05;
+  const intervals = [...scale.intervals, 12, ...scale.intervals.slice().reverse()];
+  const stepDuration = 30 / playbackState.tempo;
   const rootMidiNote = 60 + currentKey().pc;
-
-  scalePlaybackState.scaleKey = scaleKey;
-  scalePlaybackState.keyIndex = state.keyIndex;
-  intervals.forEach((interval, index) => {
-    scheduleScaleNote(context, rootMidiNote + interval, firstNoteAt + index * stepDuration, stepDuration * 0.9);
+  const events = intervals.map((interval, index) => ({
+    midi: rootMidiNote + interval,
+    start: index * stepDuration,
+    duration: stepDuration * 0.85,
+    velocity: 0.8
+  }));
+  playbackState.scaleKey = scaleKey;
+  playbackState.keyIndex = state.keyIndex;
+  playbackState.kind = "scale";
+  setPlaybackStatus(`Playing ${scale.label} in ${currentKey().label}.`);
+  player.play(events, {
+    onEnd: () => {
+      playbackState.kind = null;
+      playbackState.scaleKey = null;
+      playbackState.keyIndex = null;
+      setPlaybackStatus("");
+      updateScalePlayButtons();
+    },
+    onError: playbackError
   });
-  scalePlaybackState.timerId = window.setTimeout(
-    () => stopScalePlayback(),
-    (intervals.length * stepDuration + 0.1) * 1000
-  );
   updateScalePlayButtons();
 }
 
 function toggleScalePlayback(scaleKey) {
-  if (scalePlaybackState.scaleKey === scaleKey) {
-    stopScalePlayback();
+  if (playbackState.scaleKey === scaleKey) {
+    stopPlayback();
   } else {
     playScale(scaleKey);
   }
+}
+
+function chordVoicingKey(voicing) {
+  return voicing?.frets?.map((fret) => fret ?? "x").join("-") || "";
+}
+
+function playableChordEvents(voicing) {
+  if (!voicing || !Array.isArray(voicing.voicing)) return [];
+  const tuning = currentTuning();
+  const stepDuration = 60 / playbackState.tempo;
+
+  return voicing.voicing.flatMap((item, stringIndex) => {
+    const fret = Number(item?.fret);
+    const string = tuning.tuning[stringIndex];
+    if (!string || item?.fret === null || !Number.isInteger(fret) || fret < stringStartFret(string)) return [];
+    const midi = stringMidiAtFret(string, fret, stringIndex, tuning);
+    return Number.isFinite(midi)
+      ? [{ midi, start: 0, duration: Math.max(0.25, stepDuration * 0.9), velocity: 0.8 }]
+      : [];
+  });
+}
+
+function updateChordPlaybackControls() {
+  if (!els.playCurrentChord) return;
+  const isPlaying = playbackState.kind === "chord";
+  const hasVoicing = Boolean(selectedChordVoicing);
+  els.playCurrentChord.disabled = !hasVoicing;
+  els.playCurrentChord.textContent = isPlaying ? "■ Stop" : "▶ Play";
+  els.playCurrentChord.setAttribute("aria-pressed", String(isPlaying));
+  els.playCurrentChord.setAttribute("aria-label", `${isPlaying ? "Stop" : "Play"} current chord`);
+  if (els.stopPlayback) els.stopPlayback.disabled = !isPlaying;
+}
+
+function playCurrentChord() {
+  const events = playableChordEvents(selectedChordVoicing);
+  if (!events.length) {
+    setPlaybackStatus("Cannot play an empty chord voicing.");
+    updateChordPlaybackControls();
+    return;
+  }
+
+  const player = playbackPlayer();
+  if (!player) {
+    playbackError(new Error("Audio playback is unavailable."));
+    return;
+  }
+
+  stopPlayback();
+  playbackState.kind = "chord";
+  playbackState.keyIndex = state.keyIndex;
+  setPlaybackStatus(`Playing ${currentChord().name}.`);
+  player.play(events, {
+    onEnd: () => {
+      playbackState.kind = null;
+      playbackState.keyIndex = null;
+      setPlaybackStatus("");
+      updateChordPlaybackControls();
+      updateTriadPlaybackControls();
+    },
+    onError: playbackError
+  });
+  updateChordPlaybackControls();
+}
+
+function playableTriadEvents() {
+  const chord = triadForSelection();
+  const stepDuration = 30 / playbackState.tempo;
+  const isMap = state.triadStudyMode === "map";
+  const shape = isMap || (state.triadStudyMode === "quiz" && !state.triadExerciseRevealed)
+    ? null
+    : currentTriadShape();
+
+  if (!isMap && !shape) return [];
+  if (isMap) {
+    const rootMidiNote = 60 + currentKey().pc;
+    return chord.tones.map((tone, index) => ({
+      midi: rootMidiNote + tone.interval,
+      start: index * stepDuration,
+      duration: stepDuration * 0.8,
+      velocity: 0.85
+    }));
+  }
+
+  const tuning = currentTuning();
+  const roleOrder = chord.tones
+    .slice(state.triadInversion)
+    .concat(chord.tones.slice(0, state.triadInversion))
+    .map((tone) => tone.role);
+  const notes = shape.notes
+    .map((item, index) => {
+      const stringIndex = shape.startIndex + index;
+      const string = tuning.tuning[stringIndex];
+      if (!string || !Number.isInteger(item.fret) || item.fret < stringStartFret(string)) return null;
+      const midi = stringMidiAtFret(string, item.fret, stringIndex, tuning);
+      return Number.isFinite(midi) ? { ...item, midi, order: roleOrder.indexOf(item.role) } : null;
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.order - b.order);
+
+  return notes.map((note, index) => ({
+    midi: note.midi,
+    start: index * stepDuration,
+    duration: stepDuration * 0.8,
+    velocity: 0.85
+  }));
+}
+
+function updateTriadPlaybackControls() {
+  if (!els.playCurrentTriad) return;
+  const concealedQuiz = state.triadStudyMode === "quiz" && !state.triadExerciseRevealed;
+  const isPlaying = playbackState.kind === "triad";
+  const hasEvents = playableTriadEvents().length > 0;
+  els.playCurrentTriad.disabled = concealedQuiz || !hasEvents;
+  els.playCurrentTriad.textContent = isPlaying ? "■ Stop" : "▶ Play";
+  els.playCurrentTriad.setAttribute("aria-pressed", String(isPlaying));
+  const shape = state.triadStudyMode === "map" ? null : currentTriadShape();
+  const group = currentTriadStringGroup();
+  const inversion = ["root position", "1st inversion", "2nd inversion"][state.triadInversion];
+  const source = state.triadStudyMode === "map"
+    ? "triad map"
+    : `shape ${shape ? state.triadShapeIndex + 1 : "unavailable"}, ${group?.label || "selected strings"}, ${inversion}`;
+  els.playCurrentTriad.setAttribute("aria-label", `${isPlaying ? "Stop" : "Play"} ${source} in ${currentKey().label}`);
+  if (els.stopTriadPlayback) els.stopTriadPlayback.disabled = !isPlaying;
+}
+
+function playCurrentTriad() {
+  const events = playableTriadEvents();
+  if (!events.length) {
+    setPlaybackStatus(state.triadStudyMode === "quiz" && !state.triadExerciseRevealed
+      ? "Reveal the quiz solution before playing."
+      : "Cannot play an empty triad shape.");
+    updateTriadPlaybackControls();
+    return;
+  }
+  const player = playbackPlayer();
+  if (!player) {
+    playbackError(new Error("Audio playback is unavailable."));
+    return;
+  }
+
+  stopPlayback();
+  playbackState.kind = "triad";
+  playbackState.keyIndex = state.keyIndex;
+  setPlaybackStatus(`Playing ${currentChord().name} ${state.triadStudyMode === "map" ? "map" : "shape"}.`);
+  player.play(events, {
+    onEnd: () => {
+      playbackState.kind = null;
+      playbackState.keyIndex = null;
+      setPlaybackStatus("");
+      updateTriadPlaybackControls();
+    },
+    onError: playbackError
+  });
+  updateTriadPlaybackControls();
 }
 
 function renderChordLibrary() {
@@ -1218,6 +1523,10 @@ function renderChordLibrary() {
     ? allVoicings
     : allVoicings.filter((voicing) => chordInversionId(voicing.inversionIndex) === state.chordInversion);
   const displayVoicings = chordLibraryDisplayVoicings(selectedVoicings);
+  const selectedKey = chordVoicingKey(selectedChordVoicing);
+  selectedChordVoicing = displayVoicings.find((voicing) => chordVoicingKey(voicing) === selectedKey)
+    || displayVoicings[0]
+    || null;
   const selectedCount = selectedVoicings.length;
   const shownLabel = displayVoicings.length === selectedCount
     ? String(selectedCount)
@@ -1237,6 +1546,7 @@ function renderChordLibrary() {
   displayVoicings.forEach((voicing) => {
     els.chordLibraryGrid.append(renderChordCard(chord, voicing));
   });
+  updateChordPlaybackControls();
 }
 
 function renderChordInversionFilters(inversionOptions, totalCount) {
@@ -1284,7 +1594,25 @@ function renderChordCard(chord, voicing) {
   const inversionName = chordInversionName(voicing.inversionIndex);
   const shape = formatVoicingFrets(voicing.frets);
   card.className = "chord-card";
+  const isSelected = chordVoicingKey(voicing) === chordVoicingKey(selectedChordVoicing);
+  card.classList.toggle("is-selected", isSelected);
+  card.tabIndex = 0;
+  card.setAttribute("role", "button");
   card.setAttribute("aria-label", `${chord.name}, ${inversionName}, shape ${shape}`);
+  card.setAttribute("aria-pressed", String(isSelected));
+  const selectVoicing = () => {
+    stopPlayback();
+    selectedChordVoicing = voicing;
+    renderChordLibrary();
+    updateChordPlaybackControls();
+  };
+  card.addEventListener("click", selectVoicing);
+  card.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      selectVoicing();
+    }
+  });
 
   const heading = document.createElement("div");
   heading.className = "chord-card-heading";
@@ -1407,6 +1735,7 @@ function renderDiagramDot(item) {
 }
 
 function render() {
+  stopPlayback();
   renderProgression();
   renderFretboard();
   renderDetails();
@@ -1486,6 +1815,9 @@ function syncControls() {
   if (els.triadStringGroup) els.triadStringGroup.value = currentTriadStringGroup()?.value || "";
   if (els.triadInversion) els.triadInversion.value = String(state.triadInversion);
   if (els.triadTrainerLabels) els.triadTrainerLabels.value = state.triadTrainerLabels;
+  if (els.playbackTempo) els.playbackTempo.value = String(playbackState.tempo);
+  updateChordPlaybackControls();
+  updateProgressionPlaybackControls();
   document.querySelectorAll(".layer-toggle").forEach((input) => {
     input.checked = state.layers[input.dataset.layer];
     input.disabled = !isLayerAllowed(input.dataset.layer);
@@ -1738,7 +2070,31 @@ function populateTuningOptions() {
 }
 
 function bindEvents() {
+  bindIfPresent(els.playbackTempo, "change", (event) => {
+    stopPlayback();
+    const tempo = Number.parseInt(event.target.value, 10);
+    playbackState.tempo = Math.max(40, Math.min(240, Number.isFinite(tempo) ? tempo : 100));
+    event.target.value = String(playbackState.tempo);
+  });
+
+  bindIfPresent(els.stopPlayback, "click", () => stopPlayback({ restoreBar: true }));
+  bindIfPresent(els.stopProgressionPlayback, "click", () => stopPlayback({ restoreBar: true }));
+  bindIfPresent(els.playProgression, "click", () => {
+    if (playbackState.kind === "progression") stopPlayback({ restoreBar: true });
+    else playProgression();
+  });
+  bindIfPresent(els.playCurrentChord, "click", () => {
+    if (playbackState.kind === "chord") stopPlayback();
+    else playCurrentChord();
+  });
+  bindIfPresent(els.playCurrentTriad, "click", () => {
+    if (playbackState.kind === "triad") stopPlayback();
+    else playCurrentTriad();
+  });
+  bindIfPresent(els.stopTriadPlayback, "click", stopPlayback);
+
   bindIfPresent(els.instrumentSelect, "change", (event) => {
+    stopPlayback();
     state.instrument = event.target.value;
     if (!currentTuningOptions()[state.tuning]) state.tuning = currentInstrument().defaultTuning;
     populateTuningOptions();
@@ -1749,18 +2105,21 @@ function bindEvents() {
   });
 
   bindIfPresent(els.tuningSelect, "change", (event) => {
+    stopPlayback();
     state.tuning = event.target.value;
     saveState();
     render();
   });
 
   bindIfPresent(els.keySelect, "change", (event) => {
+    stopPlayback();
     state.keyIndex = Number(event.target.value);
     saveState();
     render();
   });
 
   bindIfPresent(els.progressionFamily, "change", (event) => {
+    stopPlayback();
     state.progressionFamily = event.target.value;
     const previousProgression = state.progression;
     populateProgressionOptions();
@@ -1772,6 +2131,7 @@ function bindEvents() {
   });
 
   bindIfPresent(els.progressionSelect, "change", (event) => {
+    stopPlayback();
     state.progression = event.target.value;
     state.currentBar = Math.min(state.currentBar, currentProgression().bars.length - 1);
     saveState();
@@ -1779,18 +2139,21 @@ function bindEvents() {
   });
 
   bindIfPresent(els.barSelect, "change", (event) => {
+    stopPlayback();
     state.currentBar = Number(event.target.value);
     saveState();
     render();
   });
 
   bindIfPresent(els.prevBar, "click", () => {
+    stopPlayback();
     state.currentBar = pc(state.currentBar - 1) % currentProgression().bars.length;
     saveState();
     render();
   });
 
   bindIfPresent(els.nextBar, "click", () => {
+    stopPlayback();
     state.currentBar = (state.currentBar + 1) % currentProgression().bars.length;
     saveState();
     render();
@@ -1893,6 +2256,7 @@ function bindEvents() {
   });
 
   bindIfPresent(els.newTriadExercise, "click", () => {
+    stopPlayback();
     const groups = triadStringGroups();
     for (let attempt = 0; attempt < 50; attempt += 1) {
       state.keyIndex = Math.floor(Math.random() * KEY_OPTIONS.length);
@@ -1924,6 +2288,7 @@ function bindEvents() {
   document.querySelectorAll(".layer-toggle").forEach((input) => {
     input.addEventListener("change", (event) => {
       if (!isLayerAllowed(event.target.dataset.layer)) return;
+      stopPlayback();
       state.layers[event.target.dataset.layer] = event.target.checked;
       saveState();
       render();
@@ -1966,6 +2331,8 @@ function cacheElements() {
     "nextTriadShape",
     "revealTriadShape",
     "newTriadExercise",
+    "playCurrentTriad",
+    "stopTriadPlayback",
     "applySuggestions",
     "clearVocabulary",
     "progressionSummary",
@@ -1994,7 +2361,13 @@ function cacheElements() {
     "triadToneList",
     "targetNoteList",
     "guideToneList",
-    "rootFifthList"
+    "rootFifthList",
+    "playbackTempo",
+    "playProgression",
+    "stopProgressionPlayback",
+    "playCurrentChord",
+    "stopPlayback",
+    "playbackStatus"
   ].forEach((id) => {
     els[id] = document.getElementById(id);
   });
@@ -2003,6 +2376,7 @@ function cacheElements() {
 function init() {
   cacheElements();
   loadState();
+  playbackState.player = window.FretLabAudio?.createPlayer() || null;
   applyPageDefaults();
   populateControls();
   bindEvents();

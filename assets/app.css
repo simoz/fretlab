@@ -435,6 +435,24 @@ body {
   border-bottom: 1px solid #e2e7ed;
 }
 
+.fret-cell[role="button"] {
+  cursor: pointer;
+}
+
+.fret-cell[role="button"]:focus-visible {
+  outline: 3px solid #f4c866;
+  outline-offset: -3px;
+}
+
+.fret-cell.is-playing {
+  background: #fff4c7;
+}
+
+.fret-cell.is-playing .note-marker {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 .2rem rgba(196, 138, 18, .3), 0 8px 18px rgba(23, 25, 28, .18);
+}
+
 .fret-cell.is-open-string {
   border-left-width: 0;
   border-right: 0;
@@ -714,6 +732,30 @@ body {
   overflow-wrap: anywhere;
 }
 
+.chord-playback-controls {
+  margin: 1rem 0 .25rem;
+}
+
+.playback-button[aria-pressed="true"] {
+  background: var(--header);
+  border-color: var(--header);
+  color: #fff;
+}
+
+.playback-button {
+  white-space: nowrap;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
+}
+
+.playback-button:hover:not(:disabled),
+.playback-button:focus-visible:not(:disabled) {
+  box-shadow: 0 0 0 .16rem rgba(32, 33, 36, .16);
+}
+
+.playback-button:disabled {
+  cursor: not-allowed;
+}
+
 .roman-badge {
   display: inline-flex;
   align-items: center;
@@ -804,6 +846,45 @@ body {
   border-color: var(--header);
   background: var(--header);
   color: #fff;
+}
+
+.playback-controls {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  flex-wrap: wrap;
+}
+
+.playback-controls label {
+  color: var(--muted);
+  font-size: .75rem;
+  font-weight: 800;
+}
+
+.playback-controls input {
+  width: 4.5rem;
+  padding: .28rem .4rem;
+  border: 1px solid #8c96a5;
+  border-radius: 6px;
+  font-size: .8rem;
+}
+
+.playback-controls input:focus-visible,
+.playback-button:focus-visible,
+.scale-play-button:focus-visible {
+  outline: 3px solid #f4c866;
+  outline-offset: 2px;
+}
+
+.playback-status {
+  min-height: 1.25rem;
+  margin: -.5rem 0 .75rem;
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+.playback-status:empty {
+  margin-bottom: 0;
 }
 
 .detail-list span {
@@ -943,6 +1024,20 @@ body {
   border-radius: 8px;
   background: #fff;
   box-shadow: 0 10px 24px rgba(32, 33, 36, .05);
+}
+
+.chord-card.is-selected {
+  border-color: var(--header);
+  box-shadow: 0 0 0 2px rgba(35, 63, 92, .16), 0 10px 24px rgba(32, 33, 36, .08);
+}
+
+.chord-card[role="button"] {
+  cursor: pointer;
+}
+
+.chord-card[role="button"]:focus-visible {
+  outline: 3px solid #f4c866;
+  outline-offset: 2px;
 }
 
 .chord-card-heading {
@@ -1330,6 +1425,29 @@ body {
 
   .triad-trainer-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575.98px) {
+  .playback-controls {
+    align-items: stretch;
+    gap: .5rem;
+  }
+
+  .playback-controls label {
+    align-self: center;
+  }
+
+  .playback-controls .playback-button {
+    flex: 1 1 auto;
+  }
+
+  .chord-playback-controls .playback-button {
+    min-width: 5.5rem;
+  }
+
+  .playback-status {
+    margin-top: .15rem;
   }
 }
 

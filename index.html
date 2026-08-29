@@ -101,7 +101,13 @@
                 <div>
                   <h2 id="scaleTitle" class="panel-title">Scale palette</h2>
                 </div>
+                <div class="playback-controls">
+                  <label for="playbackTempo">Tempo</label>
+                  <input id="playbackTempo" type="number" min="40" max="240" step="1" value="100">
+                  <button id="stopPlayback" type="button" class="btn btn-outline-secondary btn-sm">Stop</button>
+                </div>
               </div>
+              <p id="playbackStatus" class="playback-status" role="status" aria-live="polite"></p>
               <div id="scalePaletteList" class="detail-list"></div>
             </section>
           </div>
@@ -126,6 +132,7 @@
     </main>
 
     <script src="assets/data.js" defer></script>
+    <script src="assets/audio.js" defer></script>
     <script src="assets/app.js" defer></script>
   </body>
 </html>
