@@ -224,6 +224,20 @@ const SCALES = {
     quality: "Major quality",
     character: "Reference seven-note major collection",
     usage: "Tonal major harmony and melodies",
+    examples: [
+      { title: "Let It Be", artist: "The Beatles", key: "C major / Ionian", tonics: [0], focus: "Clear major-key harmony and melody" },
+      { title: "Clair de lune", artist: "Claude Debussy", key: "Db major / Ionian", tonics: [1], focus: "Db major is the principal tonal centre, with contrasting sections" },
+      { title: "Thinking Out Loud", artist: "Ed Sheeran", key: "D major / Ionian", tonics: [2], focus: "D major pop harmony with a strong tonic centre" },
+      { title: "Your Song", artist: "Elton John", key: "Eb major / Ionian", tonics: [3], focus: "Eb major piano-led tonal harmony" },
+      { title: "Don't Stop Believin'", artist: "Journey", key: "E major / Ionian", tonics: [4], focus: "E major harmony built around a repeating progression" },
+      { title: "Hey Jude", artist: "The Beatles", key: "F major / Ionian", tonics: [5], focus: "F major song form before the extended closing vamp" },
+      { title: "I Wanna Dance with Somebody", artist: "Whitney Houston", key: "Gb major / Ionian", tonics: [6], focus: "Begins in Gb major and later modulates to Ab major" },
+      { title: "Knockin' on Heaven's Door", artist: "Bob Dylan", key: "G major / Ionian", tonics: [7], focus: "A compact repeating progression in G major" },
+      { title: "Viva la Vida", artist: "Coldplay", key: "Ab major / Ionian", tonics: [8], focus: "Ab major harmony with a recurring four-chord loop" },
+      { title: "Someone Like You", artist: "Adele", key: "A major / Ionian", tonics: [9], focus: "A major harmony used in a restrained, melancholic setting" },
+      { title: "Rocket Man", artist: "Elton John", key: "Bb major / Ionian", tonics: [10], focus: "Bb major tonal framework with colourful borrowed harmony" },
+      { title: "Yellow", artist: "Coldplay", key: "B major / Ionian", tonics: [11], focus: "B major guitar harmony centred on B, F# and E" }
+    ],
     intervals: [0, 2, 4, 5, 7, 9, 11],
     roles: ["1", "2", "3", "4", "5", "6", "7"]
   },
@@ -233,6 +247,20 @@ const SCALES = {
     quality: "Minor quality",
     character: "b3, b6 and b7 distinguish it from major",
     usage: "Tonal minor harmony without a raised leading tone",
+    examples: [
+      { title: "Enjoy the Silence", artist: "Depeche Mode", key: "C natural minor / Aeolian", tonics: [0], focus: "C minor synth-pop harmony centred on an Aeolian loop" },
+      { title: "All Along the Watchtower", artist: "The Jimi Hendrix Experience", key: "C# natural minor / Aeolian", tonics: [1], focus: "A repeating Aeolian minor loop" },
+      { title: "Sultans of Swing", artist: "Dire Straits", key: "D natural minor / Aeolian", tonics: [2], focus: "D minor framework, with dominant colour in the turnaround" },
+      { title: "Superstition", artist: "Stevie Wonder", key: "Eb minor", tonics: [3], focus: "Minor-pentatonic riff inside an Eb minor context" },
+      { title: "Nothing Else Matters", artist: "Metallica", key: "E natural minor / Aeolian", tonics: [4], focus: "E minor harmony, with a raised leading tone in some cadences" },
+      { title: "Smells Like Teen Spirit", artist: "Nirvana", key: "F natural minor / Aeolian", tonics: [5], focus: "Power-chord riff outlining an F minor tonal centre" },
+      { title: "Billie Jean", artist: "Michael Jackson", key: "F# minor", tonics: [6], focus: "Minor-key groove built around an F# minor bass line" },
+      { title: "bad guy", artist: "Billie Eilish", key: "G minor", tonics: [7], focus: "Sparse G minor groove with a strong tonic centre" },
+      { title: "Tainted Love", artist: "Soft Cell", key: "G# minor", tonics: [8], focus: "G# minor synth-pop harmony and melody" },
+      { title: "Poker Face", artist: "Lady Gaga", key: "A minor", tonics: [9], focus: "A minor dance-pop harmony centred on a repeating loop" },
+      { title: "Believer", artist: "Imagine Dragons", key: "Bb minor", tonics: [10], focus: "Bb minor framework, with a major dominant adding harmonic-minor colour" },
+      { title: "Rasputin", artist: "Boney M.", key: "B natural minor / Aeolian", tonics: [11], focus: "Natural-minor framework, with harmonic-minor colour at the dominant" }
+    ],
     intervals: [0, 2, 3, 5, 7, 8, 10],
     roles: ["1", "2", "b3", "4", "5", "b6", "b7"]
   },
@@ -242,6 +270,16 @@ const SCALES = {
     quality: "Minor quality",
     character: "Natural 6 and 7 distinguish it from natural minor",
     usage: "Minor-key melodies and modern jazz harmony",
+    examples: [
+      { title: "Possibly Maybe", artist: "Björk", key: "C# melodic minor", tonics: [1], focus: "The chorus and long outro use C# jazz melodic minor" },
+      { title: "Yesterday", artist: "The Beatles", key: "D melodic minor", tonics: [2], focus: "The ascending phrase on ‘all my troubles seemed so far away’" },
+      { title: "Carol of the Bells", artist: "Mike Campese", key: "E melodic minor", tonics: [4], focus: "The third bar raises scale degrees 6 and 7 in an E minor setting" },
+      { title: "Sister Moon", artist: "Sting", key: "F# melodic minor", tonics: [6], focus: "The opening foregrounds the major 7 over an F# minor tonic" },
+      { title: "Sorry Seems to Be the Hardest Word", artist: "Elton John", key: "G melodic minor", tonics: [7], focus: "Ascending melodic-minor movement within the G minor melody" },
+      { title: "Nica's Dream", artist: "Horace Silver", key: "Ab melodic minor", tonics: [8], focus: "The opening alternates AbmMaj7 and BbmMaj7 melodic-minor harmony" },
+      { title: "Greensleeves", artist: "Traditional", key: "A melodic minor", tonics: [9], focus: "Measures 13–16 in the common A minor setting raise scale degrees 6 and 7" },
+      { title: "Nica's Dream", artist: "Horace Silver", key: "Bb melodic minor", tonics: [10], focus: "The opening alternates BbmMaj7 and AbmMaj7 melodic-minor harmony" }
+    ],
     intervals: [0, 2, 3, 5, 7, 9, 11],
     roles: ["1", "2", "b3", "4", "5", "6", "7"]
   },
@@ -251,6 +289,12 @@ const SCALES = {
     quality: "Minor quality",
     character: "Major 7 creates a strong leading tone above b6",
     usage: "Minor harmony with a dominant V chord",
+    examples: [
+      { title: "Bust Your Windows", artist: "Jazmine Sullivan", key: "F harmonic minor", tonics: [5], focus: "Fm–Db–Bbm–C harmony makes the major dominant central to the loop" },
+      { title: "Smooth", artist: "Santana feat. Rob Thomas", key: "A harmonic minor", tonics: [9], focus: "Minor harmony moving to the major dominant E" },
+      { title: "Minor Swing", artist: "Django Reinhardt & Stéphane Grappelli", key: "A minor", tonics: [9], focus: "The A-minor progression and dominant E7 invite characteristic A harmonic-minor phrases" },
+      { title: "Easy Please Me", artist: "Katy B", key: "Bb harmonic minor", tonics: [10], focus: "A rare pop example built consistently around Bb harmonic minor" }
+    ],
     intervals: [0, 2, 3, 5, 7, 8, 11],
     roles: ["1", "2", "b3", "4", "5", "b6", "7"]
   },
@@ -260,6 +304,12 @@ const SCALES = {
     quality: "Major quality",
     character: "Major scale without the 4 and 7",
     usage: "Major-key melodies, country, folk and pop",
+    examples: [
+      { title: "My Girl", artist: "The Temptations", key: "C major pentatonic", tonics: [0], focus: "Major-pentatonic guitar hook and vocal language before the modulation" },
+      { title: "Maggie May", artist: "Rod Stewart", key: "D major pentatonic", tonics: [2], focus: "The guitar solo is based on D major pentatonic, with a small number of additional notes" },
+      { title: "Amazing Grace", artist: "Traditional", key: "F major pentatonic", tonics: [5], focus: "The customary F setting uses only F, G, A, C and D" },
+      { title: "Étude Op. 10 No. 5 (Black Key)", artist: "Frédéric Chopin", key: "Gb major pentatonic", tonics: [6], focus: "The right-hand material foregrounds the five black keys, which form Gb major pentatonic" }
+    ],
     intervals: [0, 2, 4, 7, 9],
     roles: ["1", "2", "3", "5", "6"]
   },
@@ -269,6 +319,10 @@ const SCALES = {
     quality: "Minor quality",
     character: "Compact minor sound built around b3 and b7",
     usage: "Blues, rock and minor-key improvisation",
+    examples: [
+      { title: "Another Brick in the Wall, Part 2", artist: "Pink Floyd", key: "D minor pentatonic", tonics: [2], focus: "David Gilmour's guitar solo is built mainly from D minor pentatonic, with expressive bends and a few additional colours" },
+      { title: "I Wish", artist: "Stevie Wonder", key: "Eb minor pentatonic", tonics: [3], focus: "Minor-pentatonic keyboard riff" }
+    ],
     intervals: [0, 3, 5, 7, 10],
     roles: ["1", "b3", "4", "5", "b7"]
   },
@@ -278,6 +332,11 @@ const SCALES = {
     quality: "Minor blues quality",
     character: "Minor pentatonic with the b5 blue note",
     usage: "Minor and dominant blues harmony",
+    examples: [
+      { title: "Poor Boy Long Ways from Home", artist: "John Fahey", key: "D blues in open D", tonics: [2], focus: "The fingerstyle theme mixes D-major open-string harmony with bends and minor-blues colour" },
+      { title: "Blue Monk", artist: "Thelonious Monk", key: "Bb blues", tonics: [10], focus: "A twelve-bar Bb blues whose melody and improvisation make the blue notes easy to hear" },
+      { title: "The Thrill Is Gone", artist: "B.B. King", key: "B minor blues", tonics: [11], focus: "Minor-blues phrasing over a minor blues" }
+    ],
     intervals: [0, 3, 5, 6, 7, 10],
     roles: ["1", "b3", "4", "b5", "5", "b7"]
   },
@@ -287,6 +346,10 @@ const SCALES = {
     quality: "Major blues quality",
     character: "Major pentatonic with b3 as a blue note",
     usage: "Major and dominant blues harmony",
+    examples: [
+      { title: "D-Natural Blues", artist: "Wes Montgomery", key: "D major jazz blues", tonics: [2], focus: "The octave melody and solo blend major-pentatonic phrasing, the b3 blue note and chromatic approaches over a D blues" },
+      { title: "Pride and Joy", artist: "Stevie Ray Vaughan", key: "Eb major blues", tonics: [3], focus: "Major-blues language mixed with minor blue notes" }
+    ],
     intervals: [0, 2, 3, 4, 7, 9],
     roles: ["1", "2", "b3", "3", "5", "6"]
   },
@@ -296,6 +359,7 @@ const SCALES = {
     quality: "Mixed major/minor quality",
     character: "Combines b3, 3, b5 and b7",
     usage: "Rock-and-roll riffs and dominant blues harmony",
+    examples: [{ title: "Johnny B. Goode", artist: "Chuck Berry", key: "Bb", tonics: [10], focus: "Major and minor blues notes over dominant harmony" }],
     intervals: [0, 2, 3, 4, 5, 6, 7, 9, 10],
     roles: ["1", "2", "b3", "3", "4", "b5", "5", "6", "b7"]
   },
@@ -314,6 +378,13 @@ const SCALES = {
     quality: "Minor quality",
     character: "Natural 6 distinguishes it from natural minor",
     usage: "Minor i-IV vamps, modal jazz and funk",
+    examples: [
+      { title: "So What", artist: "Miles Davis", key: "D Dorian", tonics: [2], focus: "Extended Dorian harmony and modal improvisation; the bridge moves to Eb Dorian" },
+      { title: "Impressions", artist: "John Coltrane", key: "D and Eb Dorian", tonics: [2, 3], focus: "The A sections use D Dorian and the bridge moves up to Eb Dorian" },
+      { title: "My Favorite Things", artist: "John Coltrane", key: "E Dorian and E major", tonics: [4], focus: "The extended minor vamp provides a clear E Dorian improvising context" },
+      { title: "Oye Como Va", artist: "Santana", key: "A Dorian", tonics: [9], focus: "The groove alternates Am7 and D9, foregrounding Dorian's natural 6" },
+      { title: "Halo Theme", artist: "Martin O'Donnell & Michael Salvatori", key: "E Dorian", tonics: [4], focus: "The chant and main theme centre E with the characteristic C#" }
+    ],
     intervals: [0, 2, 3, 5, 7, 9, 10],
     roles: ["1", "2", "b3", "4", "5", "6", "b7"]
   },
@@ -323,6 +394,11 @@ const SCALES = {
     quality: "Minor quality",
     character: "b2 gives it its defining close pull to the root",
     usage: "Static minor harmony and suspended dominant sounds",
+    examples: [
+      { title: "Milkshake", artist: "Kelis", key: "C# Phrygian", tonics: [1], focus: "The synth and bass material centres C# and repeatedly stresses D" },
+      { title: "HUMBLE.", artist: "Kendrick Lamar", key: "D# Phrygian", tonics: [3], focus: "The piano riff centres D# and makes prominent use of E" },
+      { title: "Wherever I May Roam", artist: "Metallica", key: "E Phrygian", tonics: [4], focus: "Phrygian and Phrygian-dominant colours in the main material" }
+    ],
     intervals: [0, 1, 3, 5, 7, 8, 10],
     roles: ["1", "b2", "b3", "4", "5", "b6", "b7"]
   },
@@ -332,6 +408,7 @@ const SCALES = {
     quality: "Major quality",
     character: "#4 distinguishes it from the major scale",
     usage: "Major chords with a #11 and modal harmony",
+    examples: [{ title: "Flying in a Blue Dream", artist: "Joe Satriani", key: "C Lydian", tonics: [0], focus: "The main vamp foregrounds the #4" }],
     intervals: [0, 2, 4, 6, 7, 9, 11],
     roles: ["1", "2", "3", "#4", "5", "6", "7"]
   },
@@ -341,6 +418,11 @@ const SCALES = {
     quality: "Major / dominant quality",
     character: "b7 distinguishes it from the major scale",
     usage: "Dominant chords, blues, rock and funk",
+    examples: [
+      { title: "Playing in the Band", artist: "Grateful Dead", key: "D Mixolydian", tonics: [2], focus: "The long modal jam centres D and uses Mixolydian's C natural" },
+      { title: "L.A. Woman", artist: "The Doors", key: "A Mixolydian", tonics: [9], focus: "The main rock harmony centres A and uses G natural as the b7" },
+      { title: "Solar Power", artist: "Lorde", key: "B Mixolydian", tonics: [11], focus: "Mixolydian major harmony centred around the b7" }
+    ],
     intervals: [0, 2, 4, 5, 7, 9, 10],
     roles: ["1", "2", "3", "4", "5", "6", "b7"]
   },
@@ -359,6 +441,7 @@ const SCALES = {
     quality: "Diminished quality",
     character: "b2 and b5 weaken both tonic and dominant stability",
     usage: "Minor-key iiø harmony and diminished sonorities",
+    examples: [{ title: "Army of Me", artist: "Björk", key: "C Locrian", tonics: [0], focus: "The bass line strongly projects a Locrian collection" }],
     intervals: [0, 1, 3, 5, 6, 8, 10],
     roles: ["1", "b2", "b3", "4", "b5", "b6", "b7"]
   },
@@ -368,6 +451,7 @@ const SCALES = {
     quality: "Minor bebop quality",
     character: "Dorian with 3 as a chromatic passing tone",
     usage: "Eighth-note lines over minor and minor-sixth chords",
+    examples: [{ title: "So What (Live in Stockholm 1960)", artist: "Miles Davis", key: "D Dorian bebop vocabulary", tonics: [2], focus: "The D Dorian solo uses substantially more bebop-style chromaticism than the studio recording" }],
     intervals: [0, 2, 3, 4, 5, 7, 9, 10],
     roles: ["1", "2", "b3", "3", "4", "5", "6", "b7"]
   },
@@ -377,6 +461,7 @@ const SCALES = {
     quality: "Dominant bebop quality",
     character: "Mixolydian with 7 as a chromatic passing tone",
     usage: "Eighth-note lines over dominant chords",
+    examples: [{ title: "Billie's Bounce", artist: "Charlie Parker", key: "F dominant blues", tonics: [5], focus: "Dominant bebop phrasing over the tonic sections of the blues" }],
     intervals: [0, 2, 4, 5, 7, 9, 10, 11],
     roles: ["1", "2", "3", "4", "5", "6", "b7", "7"]
   },
@@ -386,6 +471,10 @@ const SCALES = {
     quality: "Symmetric augmented quality",
     character: "Built entirely from whole steps, with no perfect 5",
     usage: "Augmented chords and unresolved dominant sounds",
+    examples: [
+      { title: "Rhythm-a-Ning", artist: "Thelonious Monk", key: "Whole-tone colour over F7", tonics: [1, 3, 5, 7, 9, 11], focus: "The bridge explicitly uses the whole-tone collection over F7, echoed again in Monk's solo" },
+      { title: "You Are the Sunshine of My Life", artist: "Stevie Wonder", key: "B whole-tone collection", tonics: [1, 3, 5, 7, 9, 11], focus: "Whole-tone movement in the introduction" }
+    ],
     intervals: [0, 2, 4, 6, 8, 10],
     roles: ["1", "2", "3", "#4", "#5", "b7"]
   },
@@ -395,6 +484,10 @@ const SCALES = {
     quality: "Symmetric dominant quality",
     character: "Alternates half and whole steps from the root",
     usage: "Dominant b9 and altered dominant harmony",
+    examples: [
+      { title: "Woody 'n You", artist: "Dizzy Gillespie", key: "Three half-whole diminished collections", tonics: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], focus: "The A sections move through dominant 7#9 chords in three keys, exposing all three distinct diminished collections" },
+      { title: "Autumn Leaves", artist: "Michael Dease", key: "F half-whole diminished", tonics: [2, 5, 8, 11], focus: "Measures 54–55 of the solo descend through the complete F half-whole diminished collection over F7" }
+    ],
     intervals: [0, 1, 3, 4, 6, 7, 9, 10],
     roles: ["1", "b2", "#2", "3", "b5", "5", "6", "b7"]
   },
@@ -404,8 +497,22 @@ const SCALES = {
     quality: "Symmetric diminished quality",
     character: "Alternates whole and half steps from the root",
     usage: "Diminished seventh chords and passing harmony",
+    examples: [{ title: "Just", artist: "Radiohead", key: "C whole-half diminished", tonics: [0, 3, 6, 9], focus: "The intro's ascending guitar line outlines the C whole-half octatonic collection" }],
     intervals: [0, 2, 3, 5, 6, 8, 9, 11],
     roles: ["1", "2", "b3", "4", "b5", "#5", "6", "7"]
+  },
+  phrygianDominant: {
+    label: "Phrygian dominant / Flamenco",
+    family: "World / exotic",
+    quality: "Major / dominant quality",
+    character: "Phrygian b2 and b7 surrounding a major tonic triad",
+    usage: "Flamenco harmony, the Andalusian cadence and dominant sounds in minor keys",
+    examples: [
+      { title: "Cepa Andaluza", artist: "Paco de Lucía", key: "C flamenco Phrygian", tonics: [0], focus: "The bulería centres C with the characteristic major tonic, b2 and Phrygian flamenco harmony" },
+      { title: "Malagueña", artist: "Traditional", key: "E Phrygian dominant", tonics: [4], focus: "The familiar guitar melody foregrounds E, F and G#, while traditional performances may also use G natural" }
+    ],
+    intervals: [0, 1, 4, 5, 7, 8, 10],
+    roles: ["1", "b2", "3", "4", "5", "b6", "b7"]
   },
   spanish: {
     label: "Spanish",
@@ -413,6 +520,7 @@ const SCALES = {
     quality: "Mixed major/minor quality",
     character: "Combines b2, b3, 3 and b5",
     usage: "Chromatic melodies over static dominant harmony",
+    examples: [{ title: "Unbelievable", artist: "EMF", key: "G# Spanish eight-tone", tonics: [8], focus: "The recurring guitar motif highlights the mixed minor and major 3 of the Spanish-Phrygian collection" }],
     intervals: [0, 1, 3, 4, 5, 6, 8, 10],
     roles: ["1", "b2", "b3", "3", "4", "b5", "b6", "b7"]
   },
@@ -422,24 +530,34 @@ const SCALES = {
     quality: "Major quality with altered degrees",
     character: "b2, b5 and b6 frame a major 3 and 7",
     usage: "Static harmony emphasizing its augmented-second gaps",
+    examples: [{ title: "Esquisses Persanes", artist: "Naji Hakim", key: "C Persian scale", tonics: [0], focus: "Both movements are built from C–Db–E–F–Gb–Ab–B and its transpositions" }],
     intervals: [0, 1, 4, 5, 6, 8, 11],
     roles: ["1", "b2", "3", "4", "b5", "b6", "7"]
   },
   gypsyMajor: {
-    label: "Gypsy major",
+    label: "Double harmonic major",
     family: "World / exotic",
     quality: "Major quality with altered degrees",
     character: "b2 and b6 surround a major tonic triad",
     usage: "Static major harmony and augmented-second melodies",
+    examples: [
+      { title: "Tradition", artist: "Jerry Bock", key: "C double harmonic major", tonics: [0], focus: "The recurring ostinato is built from the C double harmonic collection" },
+      { title: "Misirlou", artist: "Dick Dale & His Del-Tones", key: "E double harmonic major", tonics: [4], focus: "The main melody runs through the E double harmonic major collection" }
+    ],
     intervals: [0, 1, 4, 5, 7, 8, 11],
     roles: ["1", "b2", "3", "4", "5", "b6", "7"]
   },
   gypsyMinor: {
-    label: "Gypsy minor",
+    label: "Hungarian minor",
     family: "World / exotic",
     quality: "Minor quality with altered degrees",
     character: "#4 and 7 sharpen the natural minor framework",
     usage: "Static minor harmony and augmented-second melodies",
+    examples: [
+      { title: "Inca Ruins", artist: "Yasuhiro Kawasaki", key: "C Hungarian minor", tonics: [0], focus: "The flute melody uses C Hungarian minor, including its characteristic #4" },
+      { title: "Larai Cliff", artist: "Yasuhiro Kawasaki", key: "D Hungarian minor", tonics: [2], focus: "Quotes the Inca Ruins material transposed to D" },
+      { title: "The Pink Panther Theme", artist: "Henry Mancini", key: "E Hungarian minor colour", tonics: [4], focus: "The E minor theme draws its characteristic chromaticism from the Hungarian minor collection" }
+    ],
     intervals: [0, 2, 3, 6, 7, 8, 11],
     roles: ["1", "2", "b3", "#4", "5", "b6", "7"]
   }

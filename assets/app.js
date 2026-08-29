@@ -1279,20 +1279,33 @@ function renderScalePalette() {
     const label = document.createElement("span");
     const playButton = document.createElement("button");
     const meta = document.createElement("div");
+    const description = document.createElement("div");
     const quality = document.createElement("strong");
     const character = document.createElement("small");
     const usage = document.createElement("small");
+    const listening = document.createElement("div");
+    const listeningLabel = document.createElement("small");
+    const examples = Object.values(SCALES)
+      .filter((candidate) => candidate.intervals.length === scale.intervals.length
+        && candidate.intervals.every((interval, index) => interval === scale.intervals[index]))
+      .flatMap((candidate) => candidate.examples || [])
+      .filter((example) => example.tonics.includes(currentKey().pc))
+      .filter((example, index, matches) => matches.findIndex((match) => match.title === example.title && match.artist === example.artist) === index);
     const notes = document.createElement("strong");
     row.className = "scale-palette-row";
     header.className = "scale-palette-header";
     meta.className = "scale-palette-meta";
+    description.className = "scale-description";
     quality.className = "scale-quality";
     character.className = "scale-character";
     usage.className = "scale-usage";
+    listening.className = "scale-listening";
+    listeningLabel.className = "scale-listening-label";
     label.textContent = scale.label;
     quality.textContent = scale.quality;
     character.textContent = scale.character;
     usage.textContent = `Common use: ${scale.usage}`;
+    listeningLabel.textContent = "Hear it in context";
     playButton.type = "button";
     playButton.className = "btn btn-primary btn-sm playback-button";
     playButton.dataset.scalePlay = scaleKey;
@@ -1301,9 +1314,36 @@ function renderScalePalette() {
     playButton.setAttribute("aria-pressed", String(playbackState.scaleKey === scaleKey));
     playButton.addEventListener("click", () => toggleScalePlayback(scaleKey));
     appendToneItems(notes, scaleNotes(scaleKey));
+    listening.append(listeningLabel);
+    examples.forEach((example) => {
+      const item = document.createElement("div");
+      const description = document.createElement("span");
+      const links = document.createElement("span");
+      const search = `${example.artist} ${example.title}`;
+      item.className = "scale-listening-item";
+      description.className = "scale-listening-description";
+      links.className = "scale-listening-links";
+      description.textContent = `${example.artist} — ${example.title} · ${example.key}. ${example.focus}`;
+      [
+        ["YouTube", `https://www.youtube.com/results?search_query=${encodeURIComponent(search)}`],
+        ["Spotify", `https://open.spotify.com/search/${encodeURIComponent(search)}`]
+      ].forEach(([service, url]) => {
+        const link = document.createElement("a");
+        link.href = url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = service;
+        link.setAttribute("aria-label", `Find ${example.title} by ${example.artist} on ${service}`);
+        links.append(link);
+      });
+      item.append(description, links);
+      listening.append(item);
+    });
     header.append(label, playButton);
-    meta.append(quality, character, usage);
+    description.append(quality, character);
+    meta.append(description, usage);
     row.append(header, meta, notes);
+    if (examples.length) row.append(listening);
     els.scalePaletteList.append(row);
   });
 }
