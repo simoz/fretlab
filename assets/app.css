@@ -926,6 +926,20 @@ body {
   gap: .75rem;
 }
 
+.scale-palette-meta {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+}
+
+.scale-mood {
+  color: var(--muted);
+  font-size: .73rem;
+  font-weight: 800;
+  letter-spacing: .02em;
+  text-transform: none;
+}
+
 .detail-list .scale-palette-header > span {
   color: var(--ink);
   font-size: 1rem;

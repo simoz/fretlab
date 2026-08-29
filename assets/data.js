@@ -221,150 +221,175 @@ const SCALES = {
   major: {
     label: "Major scale",
     family: "Common",
+    mood: "Bright / happy",
     intervals: [0, 2, 4, 5, 7, 9, 11],
     roles: ["1", "2", "3", "4", "5", "6", "7"]
   },
   naturalMinor: {
     label: "Natural minor",
     family: "Common",
+    mood: "Reflective / sad",
     intervals: [0, 2, 3, 5, 7, 8, 10],
     roles: ["1", "2", "b3", "4", "5", "b6", "b7"]
   },
   melodicMinor: {
     label: "Melodic minor",
     family: "Common",
+    mood: "Smooth / romantic",
     intervals: [0, 2, 3, 5, 7, 9, 11],
     roles: ["1", "2", "b3", "4", "5", "6", "7"]
   },
   harmonicMinor: {
     label: "Harmonic minor",
     family: "Common",
+    mood: "Dark / dramatic",
     intervals: [0, 2, 3, 5, 7, 8, 11],
     roles: ["1", "2", "b3", "4", "5", "b6", "7"]
   },
   majorPentatonic: {
     label: "Major pentatonic",
     family: "Pentatonic / blues",
+    mood: "Open / uplifting",
     intervals: [0, 2, 4, 7, 9],
     roles: ["1", "2", "3", "5", "6"]
   },
   minorPentatonic: {
     label: "Minor pentatonic",
     family: "Pentatonic / blues",
+    mood: "Bluesy / earthy",
     intervals: [0, 3, 5, 7, 10],
     roles: ["1", "b3", "4", "5", "b7"]
   },
   minorBlues: {
     label: "Blues / minor blues",
     family: "Pentatonic / blues",
+    mood: "Sad / soulful",
     intervals: [0, 3, 5, 6, 7, 10],
     roles: ["1", "b3", "4", "b5", "5", "b7"]
   },
   majorBlues: {
     label: "Major blues",
     family: "Pentatonic / blues",
+    mood: "Warm / upbeat",
     intervals: [0, 2, 3, 4, 7, 9],
     roles: ["1", "2", "b3", "3", "5", "6"]
   },
   rockAndRoll: {
     label: "Rock and roll",
     family: "Pentatonic / blues",
+    mood: "Raucous / rebellious",
     intervals: [0, 2, 3, 4, 5, 6, 7, 9, 10],
     roles: ["1", "2", "b3", "3", "4", "b5", "5", "6", "b7"]
   },
   ionian: {
     label: "Ionian",
     family: "Modes",
+    mood: "Clear / neutral",
     intervals: [0, 2, 4, 5, 7, 9, 11],
     roles: ["1", "2", "3", "4", "5", "6", "7"]
   },
   dorian: {
     label: "Dorian",
     family: "Modes",
+    mood: "Calm / jazzy",
     intervals: [0, 2, 3, 5, 7, 9, 10],
     roles: ["1", "2", "b3", "4", "5", "6", "b7"]
   },
   phrygian: {
     label: "Phrygian",
     family: "Modes",
+    mood: "Dark / tense",
     intervals: [0, 1, 3, 5, 7, 8, 10],
     roles: ["1", "b2", "b3", "4", "5", "b6", "b7"]
   },
   lydian: {
     label: "Lydian",
     family: "Modes",
+    mood: "Dreamy / floating",
     intervals: [0, 2, 4, 6, 7, 9, 11],
     roles: ["1", "2", "3", "#4", "5", "6", "7"]
   },
   mixolydian: {
     label: "Mixolydian",
     family: "Modes",
+    mood: "Groovy / relaxed",
     intervals: [0, 2, 4, 5, 7, 9, 10],
     roles: ["1", "2", "3", "4", "5", "6", "b7"]
   },
   aeolian: {
     label: "Aeolian",
     family: "Modes",
+    mood: "Melancholic / reflective",
     intervals: [0, 2, 3, 5, 7, 8, 10],
     roles: ["1", "2", "b3", "4", "5", "b6", "b7"]
   },
   locrian: {
     label: "Locrian",
     family: "Modes",
+    mood: "Tense / unstable",
     intervals: [0, 1, 3, 5, 6, 8, 10],
     roles: ["1", "b2", "b3", "4", "b5", "b6", "b7"]
   },
   dorianBebop: {
     label: "Dorian bebop",
     family: "Bebop / symmetric",
+    mood: "Smooth / sophisticated",
     intervals: [0, 2, 3, 4, 5, 7, 9, 10],
     roles: ["1", "2", "b3", "3", "4", "5", "6", "b7"]
   },
   mixolydianBebop: {
     label: "Mixolydian bebop",
     family: "Bebop / symmetric",
+    mood: "Swinging / buoyant",
     intervals: [0, 2, 4, 5, 7, 9, 10, 11],
     roles: ["1", "2", "3", "4", "5", "6", "b7", "7"]
   },
   wholeTone: {
     label: "Whole tone",
     family: "Bebop / symmetric",
+    mood: "Ethereal / futuristic",
     intervals: [0, 2, 4, 6, 8, 10],
     roles: ["1", "2", "3", "#4", "#5", "b7"]
   },
   halfWholeDiminished: {
     label: "Half whole diminished",
     family: "Bebop / symmetric",
+    mood: "Restless / intense",
     intervals: [0, 1, 3, 4, 6, 7, 9, 10],
     roles: ["1", "b2", "#2", "3", "b5", "5", "6", "b7"]
   },
   wholeHalfDiminished: {
     label: "Whole half diminished",
     family: "Bebop / symmetric",
+    mood: "Unsettled / mysterious",
     intervals: [0, 2, 3, 5, 6, 8, 9, 11],
     roles: ["1", "2", "b3", "4", "b5", "#5", "6", "7"]
   },
   spanish: {
     label: "Spanish",
     family: "World / exotic",
+    mood: "Dark / exotic",
     intervals: [0, 1, 3, 4, 5, 6, 8, 10],
     roles: ["1", "b2", "b3", "3", "4", "b5", "b6", "b7"]
   },
   persian: {
     label: "Persian",
     family: "World / exotic",
+    mood: "Mystical / intense",
     intervals: [0, 1, 4, 5, 6, 8, 11],
     roles: ["1", "b2", "3", "4", "b5", "b6", "7"]
   },
   gypsyMajor: {
     label: "Gypsy major",
     family: "World / exotic",
+    mood: "Fiery / exotic",
     intervals: [0, 1, 4, 5, 7, 8, 11],
     roles: ["1", "b2", "3", "4", "5", "b6", "7"]
   },
   gypsyMinor: {
     label: "Gypsy minor",
     family: "World / exotic",
+    mood: "Moody / dramatic",
     intervals: [0, 2, 3, 6, 7, 8, 11],
     roles: ["1", "2", "b3", "#4", "5", "b6", "7"]
   }
