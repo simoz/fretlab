@@ -194,15 +194,10 @@ function stopPlayback({ restoreBar = true } = {}) {
 }
 
 function playbackError(error) {
+  const message = error?.message || "Audio playback is unavailable.";
+  stopPlayback({ restoreBar: true });
   playbackState.error = error;
-  playbackState.kind = null;
-  playbackState.scaleKey = null;
-  clearPlayingCells();
-  setPlaybackStatus(error?.message || "Audio playback is unavailable.");
-  updateScalePlayButtons();
-  updateChordPlaybackControls();
-  updateTriadPlaybackControls();
-  updateProgressionPlaybackControls();
+  setPlaybackStatus(message);
 }
 
 function pc(value) {
@@ -1289,7 +1284,7 @@ function renderScalePalette() {
     header.className = "scale-palette-header";
     label.textContent = scale.label;
     playButton.type = "button";
-    playButton.className = "scale-play-button";
+    playButton.className = "btn btn-primary btn-sm playback-button";
     playButton.dataset.scalePlay = scaleKey;
     playButton.textContent = playbackState.scaleKey === scaleKey ? "■ Stop" : "▶ Play";
     playButton.setAttribute("aria-label", `${playbackState.scaleKey === scaleKey ? "Stop" : "Play"} ${scale.label} in ${currentKey().label}`);

@@ -829,25 +829,6 @@ body {
   text-transform: none;
 }
 
-.scale-play-button {
-  flex: 0 0 auto;
-  padding: .28rem .65rem;
-  border: 1px solid #8c96a5;
-  border-radius: 999px;
-  background: #fff;
-  color: var(--ink);
-  font-size: .72rem;
-  font-weight: 850;
-}
-
-.scale-play-button:hover,
-.scale-play-button:focus-visible,
-.scale-play-button[aria-pressed="true"] {
-  border-color: var(--header);
-  background: var(--header);
-  color: #fff;
-}
-
 .playback-controls {
   display: flex;
   align-items: center;
@@ -870,8 +851,7 @@ body {
 }
 
 .playback-controls input:focus-visible,
-.playback-button:focus-visible,
-.scale-play-button:focus-visible {
+.playback-button:focus-visible {
   outline: 3px solid #f4c866;
   outline-offset: 2px;
 }
