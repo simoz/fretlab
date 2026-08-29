@@ -213,4 +213,8 @@ function initMetronome() {
   bindMetronomeEvents();
 }
 
+document.addEventListener("fretlab:localechange", () => {
+  renderBeatIndicators(metronomeState.playing ? metronomeState.currentBeat : -1);
+  renderMetronome();
+});
 initMetronome();

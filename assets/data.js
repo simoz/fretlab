@@ -585,7 +585,11 @@ const SCALES = {
     usage: "Flamenco harmony, the Andalusian cadence and dominant sounds in minor keys",
     examples: [
       { title: "Cepa Andaluza", artist: "Paco de Lucía", key: "C flamenco Phrygian", tonics: [0], focus: "The bulería centres C with the characteristic major tonic, b2 and Phrygian flamenco harmony" },
-      { title: "Malagueña", artist: "Traditional", key: "E Phrygian dominant", tonics: [4], focus: "The familiar guitar melody foregrounds E, F and G#, while traditional performances may also use G natural" }
+      { title: "Mi Niño Curro", artist: "Paco de Lucía", key: "C# flamenco Phrygian / rondeña", tonics: [1], focus: "The rondeña resolves around C# and D; its characteristic tuning and open strings expand the harmony beyond a strict seven-note scale" },
+      { title: "Malagueña", artist: "Traditional", key: "E Phrygian dominant", tonics: [4], focus: "The familiar guitar melody foregrounds E, F and G#, while traditional performances may also use G natural" },
+      { title: "Fuente y Caudal", artist: "Paco de Lucía", key: "F# flamenco Phrygian / taranta", tonics: [6], focus: "The taranta centres F# against G and repeatedly resolves through the characteristic Bm–A7–G–F# flamenco motion" },
+      { title: "Lamento Minero", artist: "Paco de Lucía", key: "G# flamenco Phrygian / minera", tonics: [8], focus: "The minera uses the traditional G#–A Phrygian axis, enriched by open-string dissonances and changing major/minor-third colour" },
+      { title: "Reflejo de Luna", artist: "Paco de Lucía", key: "B flamenco Phrygian / granaína", tonics: [11], focus: "The granaína moves through Em–D–C and resolves to B, making the C–B b2-to-tonic cadence especially clear" }
     ],
     intervals: [0, 1, 4, 5, 7, 8, 10],
     roles: ["1", "b2", "3", "4", "5", "b6", "b7"]

@@ -59,10 +59,40 @@ body {
 }
 
 .app-header {
+  position: relative;
   color: #fff;
   background: var(--header);
   border-bottom: 4px solid var(--target);
   padding: 2rem 0;
+}
+
+.locale-switcher {
+  position: absolute;
+  top: 0.75rem;
+  right: 1rem;
+  display: inline-flex;
+  gap: 0.15rem;
+  padding: 0.18rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.locale-switcher button {
+  min-width: 2.2rem;
+  padding: 0.2rem 0.45rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.locale-switcher button.is-active {
+  background: var(--ink);
+  color: #fff;
 }
 
 .app-title {
@@ -1694,6 +1724,29 @@ body {
       minmax(5.75rem, .75fr)
       minmax(7.5rem, .9fr)
       minmax(4.25rem, .5fr)
+      minmax(9rem, 1.2fr)
+      minmax(8.5rem, 1fr)
+      minmax(6rem, .65fr)
+      minmax(8.75rem, 1fr);
+  }
+
+  html[lang="it"] body[data-tool="triads"] .controls-grid {
+    grid-template-columns:
+      minmax(5.5rem, .7fr)
+      minmax(7rem, .9fr)
+      minmax(7.5rem, .75fr)
+      minmax(7rem, .8fr)
+      minmax(8rem, 1fr)
+      minmax(8.5rem, 1fr)
+      minmax(5.5rem, .65fr)
+      minmax(7.5rem, .9fr);
+  }
+
+  html[lang="it"] body[data-tool="chords"] .controls-grid {
+    grid-template-columns:
+      minmax(5.75rem, .75fr)
+      minmax(7.5rem, .9fr)
+      minmax(7.5rem, .75fr)
       minmax(9rem, 1.2fr)
       minmax(8.5rem, 1fr)
       minmax(6rem, .65fr)

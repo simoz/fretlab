@@ -2495,4 +2495,5 @@ function init() {
   render();
 }
 
+document.addEventListener("fretlab:localechange", render);
 init();
