@@ -1364,7 +1364,7 @@ function playableChordEvents(voicing) {
     if (!string || item?.fret === null || !Number.isInteger(fret) || fret < stringStartFret(string)) return [];
     const midi = stringMidiAtFret(string, fret, stringIndex, tuning);
     return Number.isFinite(midi)
-      ? [{ midi, start: 0, duration: Math.max(0.25, stepDuration * 0.9), velocity: 0.8 }]
+      ? [{ midi, start: 0, duration: Math.max(0.5, stepDuration * 1.2), velocity: 0.8 }]
       : [];
   });
 }
@@ -1377,7 +1377,6 @@ function updateChordPlaybackControls() {
   els.playCurrentChord.textContent = isPlaying ? "■ Stop" : "▶ Play";
   els.playCurrentChord.setAttribute("aria-pressed", String(isPlaying));
   els.playCurrentChord.setAttribute("aria-label", `${isPlaying ? "Stop" : "Play"} current chord`);
-  if (els.stopPlayback) els.stopPlayback.disabled = !isPlaying;
 }
 
 function playCurrentChord() {
@@ -2072,7 +2071,6 @@ function bindEvents() {
     event.target.value = String(playbackState.tempo);
   });
 
-  bindIfPresent(els.stopPlayback, "click", () => stopPlayback({ restoreBar: true }));
   bindIfPresent(els.stopProgressionPlayback, "click", () => stopPlayback({ restoreBar: true }));
   bindIfPresent(els.playProgression, "click", () => {
     if (playbackState.kind === "progression") stopPlayback({ restoreBar: true });
@@ -2361,7 +2359,6 @@ function cacheElements() {
     "playProgression",
     "stopProgressionPlayback",
     "playCurrentChord",
-    "stopPlayback",
     "playbackStatus"
   ].forEach((id) => {
     els[id] = document.getElementById(id);

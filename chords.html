@@ -106,17 +106,7 @@
           </div>
 
           <div class="col-12 col-xl-4">
-            <section class="panel" aria-labelledby="currentChordTitle">
-              <div class="panel-heading">
-                <div>
-                  <h2 id="currentChordTitle" class="panel-title">Current chord</h2>
-                </div>
-              </div>
-              <div class="playback-controls chord-playback-controls">
-                <button id="playCurrentChord" type="button" class="btn btn-primary btn-sm playback-button" aria-pressed="false" disabled>▶ Play</button>
-                <button id="stopPlayback" type="button" class="btn btn-outline-secondary btn-sm playback-button">■ Stop</button>
-              </div>
-              <p id="playbackStatus" class="playback-status" role="status" aria-live="polite"></p>
+            <section class="panel" aria-label="Chord details">
               <div class="current-chord">
                 <div>
                   <span id="currentRoman" class="roman-badge">Chord</span>
@@ -138,6 +128,16 @@
                   <strong id="rootFifthList"></strong>
                 </div>
               </div>
+            </section>
+
+            <section class="panel mt-4" aria-labelledby="chordPlaybackTitle">
+              <div class="panel-heading">
+                <div>
+                  <h2 id="chordPlaybackTitle" class="panel-title">Playback</h2>
+                </div>
+                <button id="playCurrentChord" type="button" class="btn btn-primary btn-sm playback-button" aria-pressed="false" disabled>▶ Play</button>
+              </div>
+              <p id="playbackStatus" class="playback-status" role="status" aria-live="polite"></p>
             </section>
           </div>
         </div>

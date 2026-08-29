@@ -732,10 +732,6 @@ body {
   overflow-wrap: anywhere;
 }
 
-.chord-playback-controls {
-  margin: 1rem 0 .25rem;
-}
-
 .playback-button[aria-pressed="true"] {
   background: var(--header);
   border-color: var(--header);
@@ -1420,10 +1416,6 @@ body {
 
   .playback-controls .playback-button {
     flex: 1 1 auto;
-  }
-
-  .chord-playback-controls .playback-button {
-    min-width: 5.5rem;
   }
 
   .playback-status {
