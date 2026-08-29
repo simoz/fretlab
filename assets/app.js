@@ -19,7 +19,7 @@ const {
 } = window.FretLabData;
 
 const STORAGE_KEY = "fretlab-state-v1";
-const STORAGE_SCHEMA_VERSION = 3;
+const STORAGE_SCHEMA_VERSION = 5;
 const SCALE_KEYS = Object.keys(SCALES);
 const INVERSION_ALL = "all";
 const CHORD_LIBRARY_MAX_PER_INVERSION = 12;
@@ -113,6 +113,7 @@ const playbackState = {
 };
 const playingCells = new Set();
 let selectedChordVoicing = null;
+let playbackStatusTimer = null;
 
 const els = {};
 
@@ -161,8 +162,23 @@ function clearPlayingCells() {
   playingCells.clear();
 }
 
-function setPlaybackStatus(message = "") {
-  setText("playbackStatus", message);
+function setPlaybackStatus(message = "", { isError = false, duration } = {}) {
+  if (!els.playbackStatus) return;
+
+  window.clearTimeout(playbackStatusTimer);
+  playbackStatusTimer = null;
+  els.playbackStatus.textContent = message;
+  els.playbackStatus.classList.toggle("is-error", isError);
+  els.playbackStatus.classList.toggle("is-visible", Boolean(message));
+  if (!message) return;
+
+  playbackStatusTimer = window.setTimeout(() => {
+    els.playbackStatus.classList.remove("is-visible", "is-error");
+    playbackStatusTimer = window.setTimeout(() => {
+      els.playbackStatus.textContent = "";
+      playbackStatusTimer = null;
+    }, 180);
+  }, duration ?? (isError ? 5000 : 2600));
 }
 
 function stopPlayback({ restoreBar = true } = {}) {
@@ -197,7 +213,7 @@ function playbackError(error) {
   const message = error?.message || "Audio playback is unavailable.";
   stopPlayback({ restoreBar: true });
   playbackState.error = error;
-  setPlaybackStatus(message);
+  setPlaybackStatus(message, { isError: true });
 }
 
 function pc(value) {
@@ -373,7 +389,7 @@ function updateProgressionPlaybackControls() {
 function playProgression() {
   const events = playableProgressionEvents();
   if (!events.length) {
-    setPlaybackStatus("Cannot play an empty progression.");
+    setPlaybackStatus("Cannot play an empty progression.", { isError: true });
     updateProgressionPlaybackControls();
     return;
   }
@@ -1252,6 +1268,51 @@ function renderDetails() {
   setText("vocabularySummary", activeVocabularyItems().map(([, item]) => item.label).join(", ") || "None selected");
 }
 
+function renderScaleListeningExample(example) {
+  const item = document.createElement("div");
+  const heading = document.createElement("div");
+  const title = document.createElement("strong");
+  const artist = document.createElement("span");
+  const key = document.createElement("small");
+  const focus = document.createElement("p");
+  const focusLabel = document.createElement("span");
+  const links = document.createElement("span");
+  const search = `${example.artist} ${example.title}`;
+  const destinations = [
+    ["▶ YouTube", "youtube", example.youtubeUrl || `https://www.youtube.com/results?search_query=${encodeURIComponent(search)}`, true],
+    ["♫ Spotify", "spotify", example.spotifyUri || `spotify:search:${encodeURIComponent(search)}`, false]
+  ];
+
+  item.className = "scale-listening-item";
+  heading.className = "scale-listening-heading";
+  title.className = "scale-listening-title";
+  artist.className = "scale-listening-artist";
+  key.className = "scale-listening-key";
+  focus.className = "scale-listening-focus";
+  focusLabel.className = "scale-listening-focus-label";
+  links.className = "scale-listening-links";
+  title.textContent = example.title;
+  artist.textContent = example.artist;
+  key.textContent = `Context · ${example.key}`;
+  focusLabel.textContent = "Listen for:";
+  focus.append(focusLabel, document.createTextNode(` ${example.focus}`));
+  destinations.forEach(([service, serviceKey, url, opensNewTab]) => {
+    const link = document.createElement("a");
+    link.href = url;
+    link.className = `scale-listening-link is-${serviceKey}`;
+    if (opensNewTab) {
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+    }
+    link.textContent = service;
+    link.setAttribute("aria-label", `Find ${example.title} by ${example.artist} on ${serviceKey}`);
+    links.append(link);
+  });
+  heading.append(title, artist, key);
+  item.append(heading, focus, links);
+  return item;
+}
+
 function renderScalePalette() {
   if (!els.scalePaletteList) return;
 
@@ -1315,32 +1376,12 @@ function renderScalePalette() {
     playButton.addEventListener("click", () => toggleScalePlayback(scaleKey));
     appendToneItems(notes, scaleNotes(scaleKey));
     listening.append(listeningLabel);
-    examples.forEach((example) => {
-      const item = document.createElement("div");
-      const description = document.createElement("span");
-      const links = document.createElement("span");
-      const search = `${example.artist} ${example.title}`;
-      item.className = "scale-listening-item";
-      description.className = "scale-listening-description";
-      links.className = "scale-listening-links";
-      description.textContent = `${example.artist} — ${example.title} · ${example.key}. ${example.focus}`;
-      [
-        ["YouTube", `https://www.youtube.com/results?search_query=${encodeURIComponent(search)}`, true],
-        ["Spotify app", `spotify:search:${encodeURIComponent(search)}`, false]
-      ].forEach(([service, url, opensNewTab]) => {
-        const link = document.createElement("a");
-        link.href = url;
-        if (opensNewTab) {
-          link.target = "_blank";
-          link.rel = "noopener noreferrer";
-        }
-        link.textContent = service;
-        link.setAttribute("aria-label", `Find ${example.title} by ${example.artist} on ${service}`);
-        links.append(link);
-      });
-      item.append(description, links);
-      listening.append(item);
-    });
+    if (examples.length) {
+      const listeningGrid = document.createElement("div");
+      listeningGrid.className = "scale-listening-grid";
+      listeningGrid.append(...examples.map(renderScaleListeningExample));
+      listening.append(listeningGrid);
+    }
     header.append(label, playButton);
     description.append(quality, character);
     meta.append(description, usage);
@@ -1435,7 +1476,7 @@ function updateChordPlaybackControls() {
 function playCurrentChord() {
   const events = playableChordEvents(selectedChordVoicing);
   if (!events.length) {
-    setPlaybackStatus("Cannot play an empty chord voicing.");
+    setPlaybackStatus("Cannot play an empty chord voicing.", { isError: true });
     updateChordPlaybackControls();
     return;
   }
@@ -1540,7 +1581,7 @@ function playCurrentTriad() {
   if (!events.length) {
     setPlaybackStatus(state.triadStudyMode === "quiz" && !state.triadExerciseRevealed
       ? "Reveal the quiz solution before playing."
-      : "Cannot play an empty triad shape.");
+      : "Cannot play an empty triad shape.", { isError: true });
     updateTriadPlaybackControls();
     return;
   }
@@ -1904,6 +1945,14 @@ function loadState() {
     state.tuning = typeof saved.tuning === "string" ? saved.tuning : state.tuning;
     if (!currentTuningOptions()[state.tuning]) state.tuning = currentInstrument().defaultTuning;
     state.keyIndex = Number.isInteger(saved.keyIndex) ? saved.keyIndex : state.keyIndex;
+    if (savedVersion < 4) {
+      if (state.keyIndex === 2) state.keyIndex = 1;
+      else if (state.keyIndex > 2) state.keyIndex -= 1;
+    }
+    if (savedVersion < 5) {
+      if (state.keyIndex === 7) state.keyIndex = 6;
+      else if (state.keyIndex > 7) state.keyIndex -= 1;
+    }
     state.progressionFamily = saved.progressionFamily === ALL_PROGRESSION_FAMILIES || progressionFamilies().includes(saved.progressionFamily) ? saved.progressionFamily : state.progressionFamily;
     state.progression = PROGRESSIONS[saved.progression] ? saved.progression : state.progression;
     ensureProgressionVisible();
