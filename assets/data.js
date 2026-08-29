@@ -221,150 +221,225 @@ const SCALES = {
   major: {
     label: "Major scale",
     family: "Common",
+    quality: "Major quality",
+    character: "Reference seven-note major collection",
+    usage: "Tonal major harmony and melodies",
     intervals: [0, 2, 4, 5, 7, 9, 11],
     roles: ["1", "2", "3", "4", "5", "6", "7"]
   },
   naturalMinor: {
     label: "Natural minor",
     family: "Common",
+    quality: "Minor quality",
+    character: "b3, b6 and b7 distinguish it from major",
+    usage: "Tonal minor harmony without a raised leading tone",
     intervals: [0, 2, 3, 5, 7, 8, 10],
     roles: ["1", "2", "b3", "4", "5", "b6", "b7"]
   },
   melodicMinor: {
     label: "Melodic minor",
     family: "Common",
+    quality: "Minor quality",
+    character: "Natural 6 and 7 distinguish it from natural minor",
+    usage: "Minor-key melodies and modern jazz harmony",
     intervals: [0, 2, 3, 5, 7, 9, 11],
     roles: ["1", "2", "b3", "4", "5", "6", "7"]
   },
   harmonicMinor: {
     label: "Harmonic minor",
     family: "Common",
+    quality: "Minor quality",
+    character: "Major 7 creates a strong leading tone above b6",
+    usage: "Minor harmony with a dominant V chord",
     intervals: [0, 2, 3, 5, 7, 8, 11],
     roles: ["1", "2", "b3", "4", "5", "b6", "7"]
   },
   majorPentatonic: {
     label: "Major pentatonic",
     family: "Pentatonic / blues",
+    quality: "Major quality",
+    character: "Major scale without the 4 and 7",
+    usage: "Major-key melodies, country, folk and pop",
     intervals: [0, 2, 4, 7, 9],
     roles: ["1", "2", "3", "5", "6"]
   },
   minorPentatonic: {
     label: "Minor pentatonic",
     family: "Pentatonic / blues",
+    quality: "Minor quality",
+    character: "Compact minor sound built around b3 and b7",
+    usage: "Blues, rock and minor-key improvisation",
     intervals: [0, 3, 5, 7, 10],
     roles: ["1", "b3", "4", "5", "b7"]
   },
   minorBlues: {
     label: "Blues / minor blues",
     family: "Pentatonic / blues",
+    quality: "Minor blues quality",
+    character: "Minor pentatonic with the b5 blue note",
+    usage: "Minor and dominant blues harmony",
     intervals: [0, 3, 5, 6, 7, 10],
     roles: ["1", "b3", "4", "b5", "5", "b7"]
   },
   majorBlues: {
     label: "Major blues",
     family: "Pentatonic / blues",
+    quality: "Major blues quality",
+    character: "Major pentatonic with b3 as a blue note",
+    usage: "Major and dominant blues harmony",
     intervals: [0, 2, 3, 4, 7, 9],
     roles: ["1", "2", "b3", "3", "5", "6"]
   },
   rockAndRoll: {
     label: "Rock and roll",
     family: "Pentatonic / blues",
+    quality: "Mixed major/minor quality",
+    character: "Combines b3, 3, b5 and b7",
+    usage: "Rock-and-roll riffs and dominant blues harmony",
     intervals: [0, 2, 3, 4, 5, 6, 7, 9, 10],
     roles: ["1", "2", "b3", "3", "4", "b5", "5", "6", "b7"]
   },
   ionian: {
     label: "Ionian",
     family: "Modes",
+    quality: "Major quality",
+    character: "Modal name for the major scale",
+    usage: "Major tonal harmony and modal melodies",
     intervals: [0, 2, 4, 5, 7, 9, 11],
     roles: ["1", "2", "3", "4", "5", "6", "7"]
   },
   dorian: {
     label: "Dorian",
     family: "Modes",
+    quality: "Minor quality",
+    character: "Natural 6 distinguishes it from natural minor",
+    usage: "Minor i-IV vamps, modal jazz and funk",
     intervals: [0, 2, 3, 5, 7, 9, 10],
     roles: ["1", "2", "b3", "4", "5", "6", "b7"]
   },
   phrygian: {
     label: "Phrygian",
     family: "Modes",
+    quality: "Minor quality",
+    character: "b2 gives it its defining close pull to the root",
+    usage: "Static minor harmony and suspended dominant sounds",
     intervals: [0, 1, 3, 5, 7, 8, 10],
     roles: ["1", "b2", "b3", "4", "5", "b6", "b7"]
   },
   lydian: {
     label: "Lydian",
     family: "Modes",
+    quality: "Major quality",
+    character: "#4 distinguishes it from the major scale",
+    usage: "Major chords with a #11 and modal harmony",
     intervals: [0, 2, 4, 6, 7, 9, 11],
     roles: ["1", "2", "3", "#4", "5", "6", "7"]
   },
   mixolydian: {
     label: "Mixolydian",
     family: "Modes",
+    quality: "Major / dominant quality",
+    character: "b7 distinguishes it from the major scale",
+    usage: "Dominant chords, blues, rock and funk",
     intervals: [0, 2, 4, 5, 7, 9, 10],
     roles: ["1", "2", "3", "4", "5", "6", "b7"]
   },
   aeolian: {
     label: "Aeolian",
     family: "Modes",
+    quality: "Minor quality",
+    character: "Modal name for the natural minor scale",
+    usage: "Minor tonal harmony and modal melodies",
     intervals: [0, 2, 3, 5, 7, 8, 10],
     roles: ["1", "2", "b3", "4", "5", "b6", "b7"]
   },
   locrian: {
     label: "Locrian",
     family: "Modes",
+    quality: "Diminished quality",
+    character: "b2 and b5 weaken both tonic and dominant stability",
+    usage: "Minor-key iiø harmony and diminished sonorities",
     intervals: [0, 1, 3, 5, 6, 8, 10],
     roles: ["1", "b2", "b3", "4", "b5", "b6", "b7"]
   },
   dorianBebop: {
     label: "Dorian bebop",
     family: "Bebop / symmetric",
+    quality: "Minor bebop quality",
+    character: "Dorian with 3 as a chromatic passing tone",
+    usage: "Eighth-note lines over minor and minor-sixth chords",
     intervals: [0, 2, 3, 4, 5, 7, 9, 10],
     roles: ["1", "2", "b3", "3", "4", "5", "6", "b7"]
   },
   mixolydianBebop: {
     label: "Mixolydian bebop",
     family: "Bebop / symmetric",
+    quality: "Dominant bebop quality",
+    character: "Mixolydian with 7 as a chromatic passing tone",
+    usage: "Eighth-note lines over dominant chords",
     intervals: [0, 2, 4, 5, 7, 9, 10, 11],
     roles: ["1", "2", "3", "4", "5", "6", "b7", "7"]
   },
   wholeTone: {
     label: "Whole tone",
     family: "Bebop / symmetric",
+    quality: "Symmetric augmented quality",
+    character: "Built entirely from whole steps, with no perfect 5",
+    usage: "Augmented chords and unresolved dominant sounds",
     intervals: [0, 2, 4, 6, 8, 10],
     roles: ["1", "2", "3", "#4", "#5", "b7"]
   },
   halfWholeDiminished: {
     label: "Half whole diminished",
     family: "Bebop / symmetric",
+    quality: "Symmetric dominant quality",
+    character: "Alternates half and whole steps from the root",
+    usage: "Dominant b9 and altered dominant harmony",
     intervals: [0, 1, 3, 4, 6, 7, 9, 10],
     roles: ["1", "b2", "#2", "3", "b5", "5", "6", "b7"]
   },
   wholeHalfDiminished: {
     label: "Whole half diminished",
     family: "Bebop / symmetric",
+    quality: "Symmetric diminished quality",
+    character: "Alternates whole and half steps from the root",
+    usage: "Diminished seventh chords and passing harmony",
     intervals: [0, 2, 3, 5, 6, 8, 9, 11],
     roles: ["1", "2", "b3", "4", "b5", "#5", "6", "7"]
   },
   spanish: {
     label: "Spanish",
     family: "World / exotic",
+    quality: "Mixed major/minor quality",
+    character: "Combines b2, b3, 3 and b5",
+    usage: "Chromatic melodies over static dominant harmony",
     intervals: [0, 1, 3, 4, 5, 6, 8, 10],
     roles: ["1", "b2", "b3", "3", "4", "b5", "b6", "b7"]
   },
   persian: {
     label: "Persian",
     family: "World / exotic",
+    quality: "Major quality with altered degrees",
+    character: "b2, b5 and b6 frame a major 3 and 7",
+    usage: "Static harmony emphasizing its augmented-second gaps",
     intervals: [0, 1, 4, 5, 6, 8, 11],
     roles: ["1", "b2", "3", "4", "b5", "b6", "7"]
   },
   gypsyMajor: {
     label: "Gypsy major",
     family: "World / exotic",
+    quality: "Major quality with altered degrees",
+    character: "b2 and b6 surround a major tonic triad",
+    usage: "Static major harmony and augmented-second melodies",
     intervals: [0, 1, 4, 5, 7, 8, 11],
     roles: ["1", "b2", "3", "4", "5", "b6", "7"]
   },
   gypsyMinor: {
     label: "Gypsy minor",
     family: "World / exotic",
+    quality: "Minor quality with altered degrees",
+    character: "#4 and 7 sharpen the natural minor framework",
+    usage: "Static minor harmony and augmented-second melodies",
     intervals: [0, 2, 3, 6, 7, 8, 11],
     roles: ["1", "2", "b3", "#4", "5", "b6", "7"]
   }

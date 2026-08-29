@@ -1278,10 +1278,21 @@ function renderScalePalette() {
     const header = document.createElement("div");
     const label = document.createElement("span");
     const playButton = document.createElement("button");
+    const meta = document.createElement("div");
+    const quality = document.createElement("strong");
+    const character = document.createElement("small");
+    const usage = document.createElement("small");
     const notes = document.createElement("strong");
     row.className = "scale-palette-row";
     header.className = "scale-palette-header";
+    meta.className = "scale-palette-meta";
+    quality.className = "scale-quality";
+    character.className = "scale-character";
+    usage.className = "scale-usage";
     label.textContent = scale.label;
+    quality.textContent = scale.quality;
+    character.textContent = scale.character;
+    usage.textContent = `Common use: ${scale.usage}`;
     playButton.type = "button";
     playButton.className = "btn btn-primary btn-sm playback-button";
     playButton.dataset.scalePlay = scaleKey;
@@ -1291,7 +1302,8 @@ function renderScalePalette() {
     playButton.addEventListener("click", () => toggleScalePlayback(scaleKey));
     appendToneItems(notes, scaleNotes(scaleKey));
     header.append(label, playButton);
-    row.append(header, notes);
+    meta.append(quality, character, usage);
+    row.append(header, meta, notes);
     els.scalePaletteList.append(row);
   });
 }
