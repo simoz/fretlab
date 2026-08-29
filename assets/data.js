@@ -290,6 +290,7 @@ const SCALES = {
     character: "Major 7 creates a strong leading tone above b6",
     usage: "Minor harmony with a dominant V chord",
     examples: [
+      { title: "Bourrée in E minor, BWV 996", artist: "Johann Sebastian Bach", key: "E harmonic minor passages", tonics: [4], focus: "B7–Em cadences introduce D# as the leading tone, making the shift from natural to harmonic minor easy to hear" },
       { title: "Bust Your Windows", artist: "Jazmine Sullivan", key: "F harmonic minor", tonics: [5], focus: "Fm–Db–Bbm–C harmony makes the major dominant central to the loop" },
       { title: "Smooth", artist: "Santana feat. Rob Thomas", key: "A harmonic minor", tonics: [9], focus: "Minor harmony moving to the major dominant E" },
       { title: "Minor Swing", artist: "Django Reinhardt & Stéphane Grappelli", key: "A minor", tonics: [9], focus: "The A-minor progression and dominant E7 invite characteristic A harmonic-minor phrases" },
