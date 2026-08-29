@@ -1325,13 +1325,15 @@ function renderScalePalette() {
       links.className = "scale-listening-links";
       description.textContent = `${example.artist} — ${example.title} · ${example.key}. ${example.focus}`;
       [
-        ["YouTube", `https://www.youtube.com/results?search_query=${encodeURIComponent(search)}`],
-        ["Spotify", `https://open.spotify.com/search/${encodeURIComponent(search)}`]
-      ].forEach(([service, url]) => {
+        ["YouTube", `https://www.youtube.com/results?search_query=${encodeURIComponent(search)}`, true],
+        ["Spotify app", `spotify:search:${encodeURIComponent(search)}`, false]
+      ].forEach(([service, url, opensNewTab]) => {
         const link = document.createElement("a");
         link.href = url;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
+        if (opensNewTab) {
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+        }
         link.textContent = service;
         link.setAttribute("aria-label", `Find ${example.title} by ${example.artist} on ${service}`);
         links.append(link);
