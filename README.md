@@ -1,6 +1,6 @@
 # FretLab
 
-FretLab is a static browser app for studying scales, chords, progressions, and triads on guitar, bass, banjo, and ukulele fretboards. It combines interactive fingering maps, music-theory references, contextual listening examples, and browser-based audio in five focused practice tools.
+FretLab is a static browser app for studying scales, chords, progressions, and triads on guitar, bass, banjo, and ukulele fretboards. It combines interactive fingering maps, music-theory references, contextual listening examples, and browser-based audio in six focused practice tools.
 
 Live app: [https://simoz.github.io/fretlab/](https://simoz.github.io/fretlab/)
 
@@ -18,12 +18,13 @@ Then open [http://localhost:8000/](http://localhost:8000/).
 
 ## Tools
 
-The navigation bar links five pages:
+The navigation bar links six pages:
 
 - `index.html` — scale layers and contextual listening
 - `chords.html` — practical chord-voicing library
 - `progressions.html` — progression analysis and chord-relative vocabulary
 - `triads.html` — triad maps, compact shapes, and quizzes
+- `repertoire.html` — searchable index of every scale listening example
 - `metronome.html` — visual and audible practice pulse
 
 ### Scales
@@ -63,7 +64,7 @@ Included chord types:
 
 ### Progressions
 
-The progressions tool combines a family filter, progression selector, interactive bar grid, current-chord analysis, fretboard layers, focus modes, and chord-relative vocabulary suggestions.
+The progressions tool combines a family filter, progression selector, interactive bar grid, current-chord analysis, combinable fretboard layers, chord-relative vocabulary suggestions, and contextual song references.
 
 The inline player beside the progression supports tempos from 40 to 240 BPM. During playback the active bar advances visually; when playback stops or completes, the previously selected bar is restored.
 
@@ -73,6 +74,8 @@ Fretboard layers:
 - Guide tones
 - Target notes — characteristic melodic landing tones, commonly the 3rd and 7th rather than the key tonic or chord root
 - Root + fifth
+
+Every progression includes a compact song-reference card below the fretboard. It identifies the artist, recording key, actual chord sequence, and the part of the song where the progression occurs. A badge distinguishes an exact match from a section-only match or a useful variant, so similar harmonic movement is not presented as a note-for-note correspondence. Each card includes YouTube and Spotify search links.
 
 Progression families:
 
@@ -86,6 +89,10 @@ Progression families:
 - Advanced jazz: Coltrane cycle cell, Bird blues
 
 Suggested vocabulary covers triads, common scales, modal and bebop choices, altered and diminished-dominant colours, and 7/9/13 arpeggios. Suggestions can be applied together or adjusted individually.
+
+### Repertoire
+
+The repertoire page collects every scale listening example into one searchable view. Tracks are grouped by artist and title while retaining all associated scale contexts. Filters can narrow the collection by free-text search, scale, or artist, and each entry links to YouTube and Spotify.
 
 ### Triads
 
@@ -121,7 +128,7 @@ Its tempo, meter, and accent settings are saved in the browser.
 - 12, 15, 17, 20, and 24 fret ranges
 - Full range, open position, low, middle, upper, octave, and high position filters
 - Clickable and keyboard-activatable notes with pitch playback
-- Tool-specific layer and focus controls
+- Tool-specific layer controls and focused study modes where applicable
 - Browser-local state persistence through `localStorage`
 - Responsive Bootstrap-based controls and custom fretboard styling
 
@@ -133,9 +140,9 @@ Playback starts only after a user gesture, as required by browser audio policies
 
 ## Localization
 
-The complete interface is available in English and Italian, including dynamically rendered controls, scale descriptions, playback feedback, and every **Hear it in context** listening note.
+The complete interface is available in English and Italian, including dynamically rendered controls, scale descriptions, progression references, playback feedback, and every contextual listening note.
 
-The language switch appears at the top right. On the first visit FretLab follows the browser language when it is Italian and otherwise uses English. The selection is then persisted in `localStorage` and shared by all five tools.
+The language switch appears at the top right. On the first visit FretLab follows the browser language when it is Italian and otherwise uses English. The selection is then persisted in `localStorage` and shared by all six tools.
 
 ## Instruments and Tunings
 
@@ -188,9 +195,11 @@ FretLab is written in plain HTML, CSS, and JavaScript. Bootstrap CSS is vendored
 - `chords.html` — chord library
 - `progressions.html` — progression tool
 - `triads.html` — triad map and trainer
+- `repertoire.html` — unified listening repertoire
 - `metronome.html` — metronome
 - `assets/data.js` — notes, keys, chords, scales, contextual examples, progressions, vocabulary, instruments, tunings, and fret positions
-- `assets/app.js` — shared state, rendering, controls, fretboard interaction, chord generation, triad training, and playback integration
+- `assets/app.js` — shared state, rendering, controls, fretboard interaction, chord generation, progression references, triad training, and playback integration
+- `assets/repertoire.js` — repertoire aggregation, filtering, and listening links
 - `assets/audio.js` — shared Web Audio event player
 - `assets/i18n.js` — language detection, switching, persistence, and interface translations
 - `assets/i18n-examples.js` — Italian translations for contextual listening descriptions
