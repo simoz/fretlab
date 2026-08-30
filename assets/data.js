@@ -229,6 +229,7 @@ const SCALES = {
       { title: "Your Song", artist: "Elton John", key: "Eb major / Ionian", tonics: [3], focus: "Eb major piano-led tonal harmony" },
       { title: "Don't Stop Believin'", artist: "Journey", key: "E major / Ionian", tonics: [4], focus: "E major harmony built around a repeating progression" },
       { title: "Hey Jude", artist: "The Beatles", key: "F major / Ionian", tonics: [5], focus: "F major song form before the extended closing vamp" },
+      { title: "Free Fallin'", artist: "Tom Petty", key: "F major / Ionian", tonics: [5], focus: "The repeating F–Bbsus2–F–Csus loop keeps the complete song anchored in F major" },
       { title: "I Wanna Dance with Somebody", artist: "Whitney Houston", key: "Gb major / Ionian", tonics: [6], focus: "Begins in Gb major and later modulates to Ab major" },
       { title: "Knockin' on Heaven's Door", artist: "Bob Dylan", key: "G major / Ionian", tonics: [7], focus: "A compact repeating progression in G major" },
       { title: "Viva la Vida", artist: "Coldplay", key: "Ab major / Ionian", tonics: [8], focus: "Ab major harmony with a recurring four-chord loop" },
@@ -249,6 +250,9 @@ const SCALES = {
       { title: "Enjoy the Silence", artist: "Depeche Mode", key: "C natural minor / Aeolian", tonics: [0], focus: "C minor synth-pop harmony centred on an Aeolian loop" },
       { title: "All Along the Watchtower", artist: "The Jimi Hendrix Experience", key: "C# natural minor / Aeolian", tonics: [1], focus: "A repeating Aeolian minor loop" },
       { title: "Sultans of Swing", artist: "Dire Straits", key: "D natural minor / Aeolian", tonics: [2], focus: "D minor framework, with dominant colour in the turnaround" },
+      { title: "Berimbau", artist: "Baden Powell & Vinícius de Moraes", key: "D minor modal centre", tonics: [2], focus: "An open-D drone anchors the main figure before the harmony expands through chromatic minor colours" },
+      { title: "Canto de Ossanha", artist: "Baden Powell & Vinícius de Moraes", key: "D minor modal centre", tonics: [2], focus: "The repeating figure is anchored by an open-D drone; later sections broaden the minor centre with major and chromatic harmony" },
+      { title: "Samba em Prelúdio", artist: "Baden Powell & Vinícius de Moraes", key: "D minor", tonics: [2], focus: "The lyrical theme and accompaniment establish D minor, then enrich it with chromatic voice leading and changing dominant colours" },
       { title: "Superstition", artist: "Stevie Wonder", key: "Eb minor", tonics: [3], focus: "Minor-pentatonic riff inside an Eb minor context" },
       { title: "Nothing Else Matters", artist: "Metallica", key: "E natural minor / Aeolian", tonics: [4], focus: "E minor harmony, with a raised leading tone in some cadences" },
       { title: "Smells Like Teen Spirit", artist: "Nirvana", key: "F natural minor / Aeolian", tonics: [5], focus: "Power-chord riff outlining an F minor tonal centre" },
@@ -256,6 +260,8 @@ const SCALES = {
       { title: "bad guy", artist: "Billie Eilish", key: "G minor", tonics: [7], focus: "Sparse G minor groove with a strong tonic centre" },
       { title: "Tainted Love", artist: "Soft Cell", key: "G# minor", tonics: [8], focus: "G# minor synth-pop harmony and melody" },
       { title: "Poker Face", artist: "Lady Gaga", key: "A minor", tonics: [9], focus: "A minor dance-pop harmony centred on a repeating loop" },
+      { title: "Samba Triste", artist: "Baden Powell & Billy Blanco", key: "A minor", tonics: [9], focus: "A minor is the principal centre, coloured by descending chromatic harmony and functional dominant movement" },
+      { title: "Rhiannon", artist: "Fleetwood Mac", key: "A natural minor / Aeolian", tonics: [9], focus: "The recurring Am–F movement and vocal melody keep A as the minor centre, with F natural supplying Aeolian's b6" },
       { title: "Believer", artist: "Imagine Dragons", key: "Bb minor", tonics: [10], focus: "Bb minor framework, with a major dominant adding harmonic-minor colour" },
       { title: "Rasputin", artist: "Boney M.", key: "B natural minor / Aeolian", tonics: [11], focus: "Natural-minor framework, with harmonic-minor colour at the dominant" }
     ],
@@ -334,6 +340,8 @@ const SCALES = {
       { title: "Can't Buy Me Love", artist: "The Beatles", key: "C minor pentatonic over C major blues", tonics: [0], focus: "George Harrison's solo uses C minor-pentatonic phrasing over a bright dominant-blues progression in C" },
       { title: "Jolene", artist: "Dolly Parton", key: "C# minor pentatonic", tonics: [1], focus: "The recurring guitar figure and minor-key accompaniment make C# minor pentatonic an immediate practical framework for the song" },
       { title: "Another Brick in the Wall, Part 2", artist: "Pink Floyd", key: "D minor pentatonic", tonics: [2], focus: "David Gilmour's guitar solo is built mainly from D minor pentatonic, with expressive bends and a few additional colours" },
+      { title: "Black Magic Woman", artist: "Fleetwood Mac", key: "D minor pentatonic solo", tonics: [2], focus: "Peter Green's first solo is rooted in D minor pentatonic, then adds b6 over Gm7 for extra minor colour" },
+      { title: "Consolação", artist: "Baden Powell & Vinícius de Moraes", key: "D modal minor / pentatonic core", tonics: [2], focus: "The Dm7–Am7 opening reduces to a D minor-pentatonic core plus E, offering a compact bridge from pentatonic phrasing to modal minor" },
       { title: "I Wish", artist: "Stevie Wonder", key: "Eb minor pentatonic", tonics: [3], focus: "Minor-pentatonic keyboard riff" },
       { title: "Whole Lotta Love", artist: "Led Zeppelin", key: "E minor pentatonic", tonics: [4], focus: "The main riff and much of Jimmy Page's solo use E minor-pentatonic vocabulary around the open E" },
       { title: "Paranoid", artist: "Black Sabbath", key: "E minor pentatonic", tonics: [4], focus: "The compact riff and power-chord writing make the E minor-pentatonic collection especially easy to recognise" },
@@ -438,6 +446,7 @@ const SCALES = {
       { title: "Mike's Song", artist: "Phish", key: "F# Dorian", tonics: [6], focus: "The extended F# minor vamp supports Dorian improvisation, with D# supplying the characteristic natural 6" },
       { title: "Milestones", artist: "Miles Davis", key: "G Dorian", tonics: [7], focus: "The opening sixteen-bar modal section centres G minor while retaining E natural, Dorian's characteristic natural 6" },
       { title: "Oye Como Va", artist: "Santana", key: "A Dorian", tonics: [9], focus: "The groove alternates Am7 and D9, foregrounding Dorian's natural 6" },
+      { title: "Mary Jane's Last Dance", artist: "Tom Petty and the Heartbreakers", key: "A Dorian", tonics: [9], focus: "The A-minor riff and harmonica language use minor pentatonic as a base, while F# and the D chord expose Dorian's natural 6" },
       { title: "Chameleon", artist: "Herbie Hancock", key: "Bb Dorian", tonics: [10], focus: "The long Bbm7–Eb7 vamp establishes Bb as home while G natural supplies the defining Dorian 6" },
       { title: "Get Lucky", artist: "Daft Punk feat. Pharrell Williams", key: "B Dorian", tonics: [11], focus: "The repeating Bm7–D–F#m7–E loop keeps B as the minor centre while G# supplies Dorian's characteristic natural 6" },
       { title: "Sing About Me, I'm Dying of Thirst", artist: "Kendrick Lamar", key: "C# Dorian", tonics: [1], focus: "The sampled loop and vocal sections centre C# minor while retaining A# as Dorian's natural 6" },
@@ -470,7 +479,12 @@ const SCALES = {
     quality: "Major quality",
     character: "#4 distinguishes it from the major scale",
     usage: "Major chords with a #11 and modal harmony",
-    examples: [{ title: "Flying in a Blue Dream", artist: "Joe Satriani", key: "C, Ab, G and F Lydian sections", tonics: [0, 5, 7, 8], focus: "Successive Lydian centres retain the same major-with-#4 colour; the G section foregrounds C# over a G tonic" }],
+    examples: [
+      { title: "Flying in a Blue Dream", artist: "Joe Satriani", key: "C, Ab, G and F Lydian sections", tonics: [0, 5, 7, 8], focus: "Successive Lydian centres retain the same major-with-#4 colour; the G section foregrounds C# over a G tonic" },
+      { title: "Sara", artist: "Fleetwood Mac", key: "F Lydian opening", tonics: [5], focus: "The opening F–G vamp treats F as its centre, with B natural inside G providing the characteristic Lydian #4" },
+      { title: "Dreams", artist: "Fleetwood Mac", key: "F Lydian harmonic colour", tonics: [5], focus: "The repeating Fmaj7–G harmonic layer creates an F-Lydian vamp, although the vocal melody leaves the overall tonal centre deliberately ambiguous" },
+      { title: "Here Comes My Girl", artist: "Tom Petty and the Heartbreakers", key: "A Lydian verse", tonics: [9], focus: "The verses alternate A and B over an A pedal, making D# the Lydian #4 before the chorus resolves the wider song to E major" }
+    ],
     intervals: [0, 2, 4, 6, 7, 9, 11],
     roles: ["1", "2", "3", "#4", "5", "6", "7"]
   },
@@ -587,6 +601,7 @@ const SCALES = {
       { title: "Cepa Andaluza", artist: "Paco de Lucía", key: "C flamenco Phrygian", tonics: [0], focus: "The bulería centres C with the characteristic major tonic, b2 and Phrygian flamenco harmony" },
       { title: "Mi Niño Curro", artist: "Paco de Lucía", key: "C# flamenco Phrygian / rondeña", tonics: [1], focus: "The rondeña resolves around C# and D; its characteristic tuning and open strings expand the harmony beyond a strict seven-note scale" },
       { title: "Malagueña", artist: "Traditional", key: "E Phrygian dominant", tonics: [4], focus: "The familiar guitar melody foregrounds E, F and G#, while traditional performances may also use G natural" },
+      { title: "Hava Nagila", artist: "Dick Dale & His Del-Tones", key: "E Phrygian dominant", tonics: [4], focus: "The E-centred arrangement emphasizes the tonic, b2 and major 3 through its rapid melody and E–F chord movement" },
       { title: "Fuente y Caudal", artist: "Paco de Lucía", key: "F# flamenco Phrygian / taranta", tonics: [6], focus: "The taranta centres F# against G and repeatedly resolves through the characteristic Bm–A7–G–F# flamenco motion" },
       { title: "Lamento Minero", artist: "Paco de Lucía", key: "G# flamenco Phrygian / minera", tonics: [8], focus: "The minera uses the traditional G#–A Phrygian axis, enriched by open-string dissonances and changing major/minor-third colour" },
       { title: "Reflejo de Luna", artist: "Paco de Lucía", key: "B flamenco Phrygian / granaína", tonics: [11], focus: "The granaína moves through Em–D–C and resolves to B, making the C–B b2-to-tonic cadence especially clear" }
@@ -600,7 +615,12 @@ const SCALES = {
     quality: "Mixed major/minor quality",
     character: "Combines b2, b3, 3 and b5",
     usage: "Chromatic melodies over static dominant harmony",
-    examples: [{ title: "Unbelievable", artist: "EMF", key: "G# Spanish eight-tone", tonics: [8], focus: "The recurring guitar motif highlights the mixed minor and major 3 of the Spanish-Phrygian collection" }],
+    examples: [
+      { title: "Unholy", artist: "Sam Smith feat. Kim Petras", key: "C# Spanish-Phrygian mixture", tonics: [1], focus: "The hook alternates Phrygian-dominant colour with a fleeting minor 3, exposing the Spanish scale's characteristic major/minor-third mixture" },
+      { title: "La Fiesta", artist: "Chick Corea", key: "E Spanish Phrygian", tonics: [4], focus: "The E-centred flamenco vamp and theme move between the minor and major 3 while repeatedly stressing the b2" },
+      { title: "Ring of Fire", artist: "Johnny Cash", key: "G Spanish eight-tone and major mixture", tonics: [7], focus: "The recurring lead and brass figures blend G-major material with Spanish eight-tone chromatic colour" },
+      { title: "Unbelievable", artist: "EMF", key: "G# Spanish eight-tone", tonics: [8], focus: "The recurring guitar motif highlights the mixed minor and major 3 of the Spanish-Phrygian collection" }
+    ],
     intervals: [0, 1, 3, 4, 5, 6, 8, 10],
     roles: ["1", "b2", "b3", "3", "4", "b5", "b6", "b7"]
   },

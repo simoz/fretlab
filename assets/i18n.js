@@ -3,7 +3,9 @@
   const supportedLocales = ["en", "it"];
   const italian = {
     "FretLab - Scales": "FretLab - Scale", "FretLab - Chords": "FretLab - Accordi", "FretLab - Progressions": "FretLab - Progressioni", "FretLab - Triads": "FretLab - Triadi", "FretLab - Metronome": "FretLab - Metronomo",
-    "Scales": "Scale", "Chords": "Accordi", "Progressions": "Progressioni", "Triads": "Triadi", "Metronome": "Metronomo",
+    "Scales": "Scale", "Chords": "Accordi", "Progressions": "Progressioni", "Triads": "Triadi", "Metronome": "Metronomo", "Repertoire": "Repertorio",
+    "FretLab - Repertoire": "FretLab - Repertorio", "Every listening example in one place.": "Tutti gli esempi d'ascolto in un'unica pagina.",
+    "Listening repertoire": "Repertorio d'ascolto", "Search by track, artist, scale, or key": "Cerca per brano, artista, scala o tonalità", "All scales": "Tutte le scale", "All artists": "Tutti gli artisti", "No matching tracks.": "Nessun brano corrispondente.", "track": "brano", "tracks": "brani", "Scale contexts": "Contesti di scala",
     "Scales on one playable map.": "Le scale su un'unica mappa interattiva.",
     "Chord library by instrument, tuning, root, and inversion.": "Libreria di accordi per strumento, accordatura, fondamentale e rivolto.",
     "Progressions, chord tones, and targets on one playable map.": "Progressioni, note degli accordi e note obiettivo su un'unica mappa interattiva.",

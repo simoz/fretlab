@@ -58,6 +58,95 @@ body {
   color: var(--ink);
 }
 
+.repertoire-filters {
+  display: grid;
+  grid-template-columns: minmax(14rem, 2fr) repeat(2, minmax(10rem, 1fr));
+  gap: .75rem;
+  margin-bottom: 1.25rem;
+}
+
+.repertoire-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: 1rem;
+}
+
+.repertoire-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.repertoire-card-header {
+  padding-bottom: .75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.repertoire-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.repertoire-artist {
+  margin: .2rem 0 0;
+  color: var(--muted);
+  font-size: .88rem;
+}
+
+.repertoire-context-label {
+  margin: .8rem 0 .45rem;
+  color: var(--muted);
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.repertoire-contexts {
+  display: grid;
+  gap: .55rem;
+}
+
+.repertoire-context {
+  padding: .65rem;
+  border-radius: 8px;
+  background: var(--app-bg);
+}
+
+.repertoire-context-heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: .35rem .75rem;
+  font-size: .8rem;
+}
+
+.repertoire-context-heading span,
+.repertoire-context p {
+  color: var(--muted);
+}
+
+.repertoire-context p {
+  margin: .35rem 0 0;
+  font-size: .78rem;
+  line-height: 1.45;
+}
+
+.repertoire-links {
+  margin-top: auto;
+  padding-top: .85rem;
+}
+
+.repertoire-empty {
+  padding: 2rem 0;
+  text-align: center;
+}
+
 .app-header {
   position: relative;
   color: #fff;
@@ -1781,6 +1870,10 @@ body {
   }
 
   .metronome-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .repertoire-filters {
     grid-template-columns: 1fr;
   }
 

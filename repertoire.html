@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FretLab - Repertoire</title>
+    <link href="assets/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/app.css" rel="stylesheet">
+  </head>
+  <body data-tool="repertoire">
+    <main class="app-shell">
+      <header class="app-header">
+        <div class="container-fluid px-3 px-lg-4">
+          <div>
+            <h1 class="app-title mb-2"><span class="title-accent">Fret</span>Lab</h1>
+            <p class="app-subtitle mb-3">Every listening example in one place.</p>
+            <nav class="tool-nav" aria-label="FretLab tools">
+              <a class="tool-nav-link" href="index.html">Scales</a>
+              <a class="tool-nav-link" href="chords.html">Chords</a>
+              <a class="tool-nav-link" href="progressions.html">Progressions</a>
+              <a class="tool-nav-link" href="triads.html">Triads</a>
+              <a class="tool-nav-link" href="metronome.html">Metronome</a>
+              <a class="tool-nav-link is-active" href="repertoire.html">Repertoire</a>
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      <section class="container-fluid px-3 px-lg-4 py-4">
+        <section class="panel" aria-labelledby="repertoireTitle">
+          <div class="panel-heading repertoire-heading">
+            <div>
+              <h2 id="repertoireTitle" class="panel-title">Listening repertoire</h2>
+              <p id="repertoireCount" class="panel-copy mb-0" aria-live="polite"></p>
+            </div>
+          </div>
+          <div class="repertoire-filters">
+            <label class="visually-hidden" for="repertoireSearch">Search by track, artist, scale, or key</label>
+            <input id="repertoireSearch" class="form-control" type="search" placeholder="Search by track, artist, scale, or key">
+            <label class="visually-hidden" for="repertoireScale">All scales</label>
+            <select id="repertoireScale" class="form-select"><option value="">All scales</option></select>
+            <label class="visually-hidden" for="repertoireArtist">All artists</label>
+            <select id="repertoireArtist" class="form-select"><option value="">All artists</option></select>
+          </div>
+          <div id="repertoireList" class="repertoire-list"></div>
+          <p id="repertoireEmpty" class="panel-copy repertoire-empty" hidden>No matching tracks.</p>
+        </section>
+      </section>
+
+      <footer class="app-footer">
+        <a href="https://github.com/simoz/fretlab">GitHub</a>
+        <a href="https://github.com/simoz/fretlab/archive/refs/heads/main.zip" download>Download</a>
+      </footer>
+    </main>
+
+    <script src="assets/i18n.js" defer></script>
+    <script src="assets/i18n-examples.js" defer></script>
+    <script src="assets/data.js?v=1" defer></script>
+    <script src="assets/repertoire.js?v=1" defer></script>
+  </body>
+</html>
