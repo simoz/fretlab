@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>FretLab - Progressions</title>
     <link href="assets/bootstrap.min.css" rel="stylesheet">
-    <link href="assets/app.css" rel="stylesheet">
+    <link href="assets/app.css?v=progression-examples" rel="stylesheet">
   </head>
   <body data-tool="progressions">
     <main class="app-shell">
@@ -20,8 +20,8 @@
                 <a class="tool-nav-link" href="chords.html">Chords</a>
                 <a class="tool-nav-link is-active" href="progressions.html">Progressions</a>
                 <a class="tool-nav-link" href="triads.html">Triads</a>
-                <a class="tool-nav-link" href="metronome.html">Metronome</a>
                 <a class="tool-nav-link" href="repertoire.html">Repertoire</a>
+                <a class="tool-nav-link" href="metronome.html">Metronome</a>
               </nav>
             </div>
             <div class="session-strip" aria-label="Current session">
@@ -125,7 +125,7 @@
               <div id="progressionGrid" class="progression-grid"></div>
             </section>
 
-            <section class="panel" aria-labelledby="fretboardTitle">
+            <section class="panel mb-4" aria-labelledby="fretboardTitle">
               <div class="panel-heading">
                 <div>
                   <h2 id="fretboardTitle" class="panel-title">Fretboard</h2>
@@ -136,6 +136,16 @@
                 <div id="fretboard" class="fretboard"></div>
               </div>
             </section>
+
+            <section class="panel" aria-labelledby="progressionExamplesTitle">
+              <div class="panel-heading">
+                <div>
+                  <h2 id="progressionExamplesTitle" class="panel-title">Songs with this progression</h2>
+                  <p class="panel-copy mb-0">Exact matches are separated from section-based examples and useful variants.</p>
+                </div>
+              </div>
+              <div id="progressionExamples" class="progression-examples"></div>
+            </section>
           </div>
 
           <div class="col-12 col-xl-4">
@@ -143,9 +153,10 @@
               <div class="panel-heading">
                 <div>
                   <h2 id="layersTitle" class="panel-title">Progression layers</h2>
+                  <p class="panel-copy mb-0">Combine one or more layers on the fretboard.</p>
                 </div>
               </div>
-              <div class="layer-grid">
+              <div class="layer-grid progression-layer-grid">
                 <input class="btn-check layer-toggle" type="checkbox" id="layerArpeggio" data-layer="arpeggio" checked>
                 <label class="btn btn-outline-dark layer-button" for="layerArpeggio">
                   <span class="layer-dot arpeggio"></span>
@@ -169,16 +180,6 @@
                   <span class="layer-dot root-fifth"></span>
                   Root + fifth
                 </label>
-              </div>
-              <div class="mt-3">
-                <label for="focusMode" class="form-label">Focus</label>
-                <select id="focusMode" class="form-select">
-                  <option value="all">All active layers</option>
-                  <option value="chordTones">Chord tones</option>
-                  <option value="guideTones">Guide tones</option>
-                  <option value="targetNotes">Target notes</option>
-                  <option value="rootFifth">Root + fifth</option>
-                </select>
               </div>
             </section>
 
@@ -249,8 +250,9 @@
     </main>
 
     <script src="assets/i18n.js" defer></script>
-    <script src="assets/data.js" defer></script>
+    <script src="assets/i18n-examples.js?v=progression-examples" defer></script>
+    <script src="assets/data.js?v=progression-examples" defer></script>
     <script src="assets/audio.js" defer></script>
-    <script src="assets/app.js" defer></script>
+    <script src="assets/app.js?v=progression-examples" defer></script>
   </body>
 </html>

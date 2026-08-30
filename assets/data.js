@@ -663,11 +663,18 @@ const SCALES = {
   }
 };
 
+function progressionExample(title, artist, key, chords, section, match, note) {
+  return { title, artist, key, chords, section, match, note };
+}
+
 const PROGRESSIONS = {
   major: {
     label: "12-bar major blues",
     family: "Blues",
     summary: "Classic I7-IV7-V7 form with the V chord in bar 12.",
+    examples: [
+      progressionExample("Rock Me Baby", "B.B. King", "Bb", "Bb7–Eb7–F7", "Whole form", "exact", "A standard twelve-bar chorus following the displayed long-change form.")
+    ],
     bars: [
       bar("I", "7", "I7"),
       bar("I", "7", "I7"),
@@ -687,6 +694,9 @@ const PROGRESSIONS = {
     label: "12-bar quick change",
     family: "Blues",
     summary: "Major blues with IV7 in bar 2 for an earlier harmonic lift.",
+    examples: [
+      progressionExample("Before You Accuse Me", "Bo Diddley", "E", "E7–A7–E7–B7–A7–E7", "Whole form", "exact", "The twelve-bar form moves to IV7 in bar 2, giving a clear quick-change example; turnaround voicings vary by version.")
+    ],
     bars: [
       bar("I", "7", "I7"),
       bar("IV", "7", "IV7"),
@@ -706,6 +716,9 @@ const PROGRESSIONS = {
     label: "12-bar minor blues",
     family: "Blues",
     summary: "Minor i7 and iv7 colors with a dominant V7 turnaround.",
+    examples: [
+      progressionExample("The Thrill Is Gone", "B.B. King", "B minor", "Bm7–Em7–Bm7–G7–F#7", "Whole form", "variant", "A twelve-bar minor blues whose final four bars substitute bVI7–V7 for the displayed V7–iv7 motion.")
+    ],
     bars: [
       bar("I", "m7", "i7"),
       bar("I", "m7", "i7"),
@@ -725,6 +738,9 @@ const PROGRESSIONS = {
     label: "Jazz blues",
     family: "Blues",
     summary: "A 12-bar blues with diminished passing harmony and a ii-V turnaround.",
+    examples: [
+      progressionExample("Straight, No Chaser", "Thelonious Monk", "F", "F7–Bb7–F7–D7–Gm7–C7", "Whole form", "variant", "A canonical jazz-blues reference; recordings and lead sheets differ in passing chords and turnaround detail.")
+    ],
     bars: [
       bar("I", "7", "I7"),
       bar("IV", "7", "IV7"),
@@ -744,6 +760,9 @@ const PROGRESSIONS = {
     label: "Minor jazz blues",
     family: "Blues",
     summary: "Minor blues with a diminished passing chord, bVI7, and a minor ii-V.",
+    examples: [
+      progressionExample("Mr. P.C.", "John Coltrane", "C minor", "Cm7–Fm7–Cm7–Ab7–Dm7b5–G7", "Whole form", "variant", "A compact minor jazz blues; the core motion matches while published turnarounds may omit the diminished passing bar.")
+    ],
     bars: [
       bar("I", "m7", "i7"),
       bar("IV", "m7", "iv7"),
@@ -763,6 +782,9 @@ const PROGRESSIONS = {
     label: "ii-V-I major",
     family: "Jazz cadences",
     summary: "Major ii-V-I cadence with an extra tonic bar for resolution.",
+    examples: [
+      progressionExample("Tune Up", "Miles Davis", "Several descending keys", "Em7–A7–Dmaj7", "Opening four bars and subsequent sequences", "exact", "Successive ii–V–I cadences are the central construction of the tune.")
+    ],
     bars: [
       bar("II", "m7", "ii7"),
       bar("V", "7", "V7"),
@@ -774,6 +796,9 @@ const PROGRESSIONS = {
     label: "ii-V-i minor",
     family: "Jazz cadences",
     summary: "Minor ii-V-i cadence using half-diminished ii and minor tonic.",
+    examples: [
+      progressionExample("Autumn Leaves", "Joseph Kosma", "E minor", "F#m7b5–B7–Em", "Minor-key cadence", "exact", "The recurring minor ii–V–i resolves from F#m7b5 through B7 to E minor.")
+    ],
     bars: [
       bar("II", "m7b5", "iim7b5"),
       bar("V", "7", "V7"),
@@ -785,6 +810,9 @@ const PROGRESSIONS = {
     label: "Rhythm changes A",
     family: "Rhythm changes",
     summary: "Eight-bar A-section turnaround movement through I, VI, ii, and V.",
+    examples: [
+      progressionExample("Oleo", "Sonny Rollins", "Bb", "Bbmaj7–G7–Cm7–F7", "A sections", "exact", "Its A sections use standard rhythm changes; substitutions differ among performances.")
+    ],
     bars: [
       bar("I", "maj7", "Imaj7"),
       bar("VI", "7", "VI7"),
@@ -800,6 +828,9 @@ const PROGRESSIONS = {
     label: "Turnaround I-VI-II-V",
     family: "Turnarounds",
     summary: "Four-bar turnaround with secondary dominants into V.",
+    examples: [
+      progressionExample("I Got Rhythm", "George Gershwin", "Bb", "Bb–G7–C7–F7", "A-section turnaround variant", "section", "Jazz performances commonly turn the diatonic I–vi–ii–V into the displayed chain of secondary dominants.")
+    ],
     bars: [
       bar("I", "maj7", "Imaj7"),
       bar("VI", "7", "VI7"),
@@ -811,6 +842,9 @@ const PROGRESSIONS = {
     label: "Modal vamp ii7-V7",
     family: "Modal vamps",
     summary: "Two-chord Dorian/Mixolydian vamp, like Dm7 to G7 in C.",
+    examples: [
+      progressionExample("Chameleon", "Herbie Hancock", "Bb Dorian", "Bbm7–Eb7", "Main vamp", "exact", "The two chords can be heard as i7–IV7 in Bb Dorian or ii7–V7 without resolution in Ab.")
+    ],
     bars: [
       bar("II", "m7", "ii7"),
       bar("V", "7", "V7")
@@ -820,6 +854,9 @@ const PROGRESSIONS = {
     label: "Dorian vamp i7-IV7",
     family: "Modal vamps",
     summary: "Minor tonic vamp with a dominant IV color for Dorian practice.",
+    examples: [
+      progressionExample("Oye Como Va", "Santana", "A Dorian", "Am7–D7", "Main vamp", "exact", "The repeating i7–IV7 vamp exposes Dorian's natural sixth through the D7 chord.")
+    ],
     bars: [
       bar("I", "m7", "i7"),
       bar("IV", "7", "IV7")
@@ -829,6 +866,9 @@ const PROGRESSIONS = {
     label: "Aeolian vamp i-bVII-bVI-bVII",
     family: "Modal vamps",
     summary: "Natural minor rock/modal loop centered on i, bVII, and bVI.",
+    examples: [
+      progressionExample("All Along the Watchtower", "The Jimi Hendrix Experience", "C# minor", "C#m–B–A–B", "Entire song", "exact", "The complete arrangement revolves around the i–bVII–bVI–bVII Aeolian loop.")
+    ],
     bars: [
       bar("I", "m", "i"),
       bar("bVII", "maj", "bVII"),
@@ -840,6 +880,9 @@ const PROGRESSIONS = {
     label: "Phrygian vamp i-bII",
     family: "Modal vamps",
     summary: "Dark minor vamp emphasizing the bII Phrygian color.",
+    examples: [
+      progressionExample("Wherever I May Roam", "Metallica", "E Phrygian", "E5–F5", "Main riff", "section", "The riff repeatedly opposes the E centre and F, reducing the Phrygian sound to i–bII power chords.")
+    ],
     bars: [
       bar("I", "m", "i"),
       bar("bII", "maj", "bII")
@@ -849,6 +892,9 @@ const PROGRESSIONS = {
     label: "Suspended vamp I-bVII",
     family: "Modal vamps",
     summary: "Open suspended sound for modal comping and pedal-tone phrasing.",
+    examples: [
+      progressionExample("Tomorrow Never Knows", "The Beatles", "C Mixolydian", "C–Bb/C", "Drone-based body of the song", "variant", "The C drone and Bb-over-C colour create the same open I–bVII suspended effect without literal sus4 chords throughout.")
+    ],
     bars: [
       bar("I", "sus4", "Isus4"),
       bar("bVII", "sus4", "bVIIsus4")
@@ -858,6 +904,9 @@ const PROGRESSIONS = {
     label: "I-V-vi-IV",
     family: "Diatonic / pop",
     summary: "Common four-chord major-key loop for pop, rock, and worship contexts.",
+    examples: [
+      progressionExample("Don't Stop Believin'", "Journey", "E", "E–B–C#m–A", "First half of the main eight-chord pattern", "section", "The famous pattern begins with an exact I–V–vi–IV loop, then changes vi to iii in its second half.")
+    ],
     bars: [
       bar("I", "maj", "I"),
       bar("V", "maj", "V"),
@@ -869,6 +918,9 @@ const PROGRESSIONS = {
     label: "vi-IV-I-V",
     family: "Diatonic / pop",
     summary: "Relative-minor start on the axis progression, useful for melodic sequencing.",
+    examples: [
+      progressionExample("Numb", "Linkin Park", "F# minor / A major", "F#m–D–A–E", "Verse and chorus loop", "exact", "The recurring loop is the vi–IV–I–V rotation of the pop-axis progression.")
+    ],
     bars: [
       bar("VI", "m", "vi"),
       bar("IV", "maj", "IV"),
@@ -880,6 +932,9 @@ const PROGRESSIONS = {
     label: "I-vi-IV-V",
     family: "Diatonic / pop",
     summary: "Classic doo-wop loop with a dominant V for a stronger cadence.",
+    examples: [
+      progressionExample("Stand by Me", "Ben E. King", "A", "A–F#m–D–E", "Main loop", "variant", "The song uses the exact I–vi–IV–V roots, normally with a major V rather than the displayed V7 voicing.")
+    ],
     bars: [
       bar("I", "maj", "I"),
       bar("VI", "m", "vi"),
@@ -891,6 +946,9 @@ const PROGRESSIONS = {
     label: "Canon sequence",
     family: "Diatonic / pop",
     summary: "Eight-bar descending sequence: I-V-vi-iii-IV-I-IV-V.",
+    examples: [
+      progressionExample("Canon in D", "Johann Pachelbel", "D", "D–A–Bm–F#m–G–D–G–A", "Ground bass throughout", "exact", "The displayed sequence is the work's repeating harmonic ground.")
+    ],
     bars: [
       bar("I", "maj", "I"),
       bar("V", "maj", "V"),
@@ -906,6 +964,9 @@ const PROGRESSIONS = {
     label: "Diatonic circle",
     family: "Diatonic / pop",
     summary: "Major-key circle movement through I, IV, vii, iii, vi, ii, V, and I.",
+    examples: [
+      progressionExample("Autumn Leaves", "Joseph Kosma", "G minor / Bb major", "Cm7–F7–Bbmaj7–Ebmaj7–Am7b5–D7–Gm", "Opening eight bars", "section", "The opening follows the diatonic circle from ii through V–I–IV and onward to the relative-minor cadence.")
+    ],
     bars: [
       bar("I", "maj7", "Imaj7"),
       bar("IV", "maj7", "IVmaj7"),
@@ -921,6 +982,9 @@ const PROGRESSIONS = {
     label: "i-iv-V",
     family: "Minor harmony",
     summary: "Essential minor-key cadence with a harmonic-minor dominant V.",
+    examples: [
+      progressionExample("Minor Swing", "Django Reinhardt & Stéphane Grappelli", "A minor", "Am–Dm–E7–Am", "Core harmonic cycle", "exact", "The essential minor i–iv–V–i cadence forms the tune's harmonic backbone.")
+    ],
     bars: [
       bar("I", "m", "i"),
       bar("IV", "m", "iv"),
@@ -932,6 +996,9 @@ const PROGRESSIONS = {
     label: "Andalusian cadence",
     family: "Minor harmony",
     summary: "Descending minor loop: i-bVII-bVI-V.",
+    examples: [
+      progressionExample("Hit the Road Jack", "Ray Charles", "A minor", "Am–G–F–E", "Entire song", "exact", "The repeating bass and harmony state the Andalusian i–bVII–bVI–V descent directly.")
+    ],
     bars: [
       bar("I", "m", "i"),
       bar("bVII", "maj", "bVII"),
@@ -943,6 +1010,9 @@ const PROGRESSIONS = {
     label: "i-bVI-bVII",
     family: "Minor harmony",
     summary: "Minor rock loop for Aeolian melodies and power-chord vocabulary.",
+    examples: [
+      progressionExample("Isn't It Midnight", "Fleetwood Mac", "B minor", "Bm–G–A–Bm", "Chorus", "exact", "The chorus follows i–bVI–bVII–i in a direct minor-rock form.")
+    ],
     bars: [
       bar("I", "m", "i"),
       bar("bVI", "maj", "bVI"),
@@ -954,6 +1024,9 @@ const PROGRESSIONS = {
     label: "Minor circle cadence",
     family: "Minor harmony",
     summary: "Long minor-key circle movement ending with a ii-V-i resolution.",
+    examples: [
+      progressionExample("I Will Survive", "Gloria Gaynor", "A minor", "Am–Dm–G–C–F–Bm7b5–E7–Am", "Main loop", "exact", "The full loop follows the minor circle and closes with iiø7–V7–i.")
+    ],
     bars: [
       bar("I", "m7", "i7"),
       bar("IV", "m7", "iv7"),
@@ -969,6 +1042,9 @@ const PROGRESSIONS = {
     label: "Backdoor ii-V-I",
     family: "Jazz cadences",
     summary: "Minor iv to bVII7 resolving into Imaj7.",
+    examples: [
+      progressionExample("Just the Two of Us", "Grover Washington Jr. feat. Bill Withers", "F minor / Ab major", "Dbmaj7–C7–Fm7–Eb7–Abmaj7", "Main loop cadence", "section", "The Eb7–Abmaj7 resolution supplies the backdoor bVII7–I gesture; the preceding minor-subdominant function is expanded by the longer loop.")
+    ],
     bars: [
       bar("IV", "m7", "iv7"),
       bar("bVII", "7", "bVII7"),
@@ -980,6 +1056,9 @@ const PROGRESSIONS = {
     label: "Tritone sub ii-bII-I",
     family: "Jazz cadences",
     summary: "ii7 into bII7 as a tritone substitution for V7.",
+    examples: [
+      progressionExample("The Girl from Ipanema", "Antônio Carlos Jobim", "F", "Gm7–Gb7–Fmaj7", "Turnaround/cadential treatment", "section", "A common jazz treatment replaces C7 with Gb7, producing the exact ii7–bII7–Imaj7 cadence.")
+    ],
     bars: [
       bar("II", "m7", "ii7"),
       bar("bII", "7", "bII7"),
@@ -991,6 +1070,9 @@ const PROGRESSIONS = {
     label: "III-VI-II-V",
     family: "Turnarounds",
     summary: "Dominant-chain turnaround moving by fifths back to I.",
+    examples: [
+      progressionExample("Blues for Alice", "Charlie Parker", "F", "A7–D7–G7–C7", "Final two bars", "section", "The ending compresses the III7–VI7–II7–V7 dominant chain before returning to F.")
+    ],
     bars: [
       bar("III", "7", "III7"),
       bar("VI", "7", "VI7"),
@@ -1002,6 +1084,9 @@ const PROGRESSIONS = {
     label: "Lady Bird turnaround",
     family: "Turnarounds",
     summary: "Chromatic-color turnaround: Imaj7, bIII7, bVImaj7, bII7.",
+    examples: [
+      progressionExample("Lady Bird", "Tadd Dameron", "C", "Cmaj7–Eb7–Abmaj7–Db7", "Final two bars", "exact", "The progression is taken directly from the ending of the composition that gives it its name.")
+    ],
     bars: [
       bar("I", "maj7", "Imaj7"),
       bar("bIII", "7", "bIII7"),
@@ -1013,6 +1098,9 @@ const PROGRESSIONS = {
     label: "Coltrane cycle cell",
     family: "Advanced jazz",
     summary: "Major-third cycle cell for practicing fast key-center shifts.",
+    examples: [
+      progressionExample("Giant Steps", "John Coltrane", "B / G / Eb key centres", "Bmaj7–D7–Gmaj7–Bb7–Ebmaj7", "Opening cycle", "section", "The opening traverses the tune's three major key centres by major thirds with dominant preparation.")
+    ],
     bars: [
       bar("I", "maj7", "Imaj7"),
       bar("bIII", "7", "bIII7"),
@@ -1027,6 +1115,9 @@ const PROGRESSIONS = {
     label: "Bird blues",
     family: "Advanced jazz",
     summary: "Bebop blues variant with faster ii-V motion through the form.",
+    examples: [
+      progressionExample("Blues for Alice", "Charlie Parker", "F", "Fmaj7–Em7b5 A7–Dm7 G7–Cm7 F7…", "Whole form", "exact", "The displayed Bird-blues family is named for the rapid descending ii–V chains in this composition.")
+    ],
     bars: [
       bar("I", "maj7", "Imaj7"),
       bar("VI", "m7b5", "vim7b5"),

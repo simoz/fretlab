@@ -50,7 +50,7 @@ const PAGE_CONFIGS = {
   },
   progressions: {
     defaultFocus: "all",
-    focusModes: ["all", "chordTones", "guideTones", "targetNotes", "rootFifth"],
+    focusModes: ["all"],
     allowedLayers: ["arpeggio", "guideTones", "targets", "rootFifth"],
     defaultLayers: { arpeggio: true, targets: true }
   },
@@ -1122,6 +1122,49 @@ function renderProgression() {
   });
 
   if (els.barSelect) els.barSelect.value = String(state.currentBar);
+
+  if (els.progressionExamples) {
+    const matchLabels = { exact: "Exact match", section: "Section match", variant: "Useful variant" };
+    const translated = (value) => window.FretLabI18n?.t(value) || value;
+    els.progressionExamples.innerHTML = "";
+    (progression.examples || []).forEach((example) => {
+      const article = document.createElement("article");
+      const links = document.createElement("div");
+      const search = `${example.artist} ${example.title}`;
+      const destinations = [
+        ["▶ YouTube", "youtube", example.youtubeUrl || `https://www.youtube.com/results?search_query=${encodeURIComponent(search)}`, true],
+        ["♫ Spotify", "spotify", example.spotifyUri || `spotify:search:${encodeURIComponent(search)}`, false]
+      ];
+      article.className = "progression-example";
+      article.innerHTML = `
+        <div class="progression-example-heading">
+          <div><h3>${example.title}</h3><p>${example.artist}</p></div>
+          <span class="progression-match progression-match-${example.match}">${translated(matchLabels[example.match] || example.match)}</span>
+        </div>
+        <dl class="progression-example-details">
+          <div><dt>${translated("Key")}</dt><dd>${translated(example.key)}</dd></div>
+          <div><dt>${translated("Chords")}</dt><dd>${example.chords}</dd></div>
+          <div><dt>${translated("Where")}</dt><dd>${translated(example.section)}</dd></div>
+        </dl>
+        <p class="progression-example-note">${translated(example.note)}</p>
+      `;
+      links.className = "scale-listening-links progression-example-links";
+      destinations.forEach(([service, serviceKey, url, opensNewTab]) => {
+        const link = document.createElement("a");
+        link.href = url;
+        link.className = `is-${serviceKey}`;
+        if (opensNewTab) {
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+        }
+        link.textContent = service;
+        link.setAttribute("aria-label", `${translated("Find")} ${example.title} ${translated("by")} ${example.artist} ${translated("on")} ${serviceKey}`);
+        links.append(link);
+      });
+      article.append(links);
+      els.progressionExamples.append(article);
+    });
+  }
 }
 
 function renderFretboard() {
@@ -2458,6 +2501,7 @@ function cacheElements() {
     "suggestedVocabularySummary",
     "vocabularySummary",
     "progressionGrid",
+    "progressionExamples",
     "chordInversionFilters",
     "chordLibrarySummary",
     "chordLibraryGrid",
