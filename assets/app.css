@@ -60,7 +60,7 @@ body {
 
 .repertoire-filters {
   display: grid;
-  grid-template-columns: minmax(14rem, 2fr) repeat(2, minmax(10rem, 1fr));
+  grid-template-columns: minmax(14rem, 2fr) repeat(3, minmax(9rem, 1fr));
   gap: .75rem;
   margin-bottom: 1.25rem;
 }
@@ -110,6 +110,14 @@ body {
 .repertoire-contexts {
   display: grid;
   gap: .55rem;
+}
+
+.repertoire-contexts .repertoire-context-label:not(:first-child) {
+  margin-top: .35rem;
+}
+
+.repertoire-progression-context .progression-match {
+  font-size: .58rem;
 }
 
 .repertoire-context {

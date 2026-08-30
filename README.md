@@ -24,7 +24,7 @@ The navigation bar links six pages:
 - `chords.html` — practical chord-voicing library
 - `progressions.html` — progression analysis and chord-relative vocabulary
 - `triads.html` — triad maps, compact shapes, and quizzes
-- `repertoire.html` — searchable index of every scale listening example
+- `repertoire.html` — searchable index of scale and progression listening examples
 - `metronome.html` — visual and audible practice pulse
 
 ### Scales
@@ -92,7 +92,7 @@ Suggested vocabulary covers triads, common scales, modal and bebop choices, alte
 
 ### Repertoire
 
-The repertoire page collects every scale listening example into one searchable view. Tracks are grouped by artist and title while retaining all associated scale contexts. Filters can narrow the collection by free-text search, scale, or artist, and each entry links to YouTube and Spotify.
+The repertoire page collects every scale and progression listening example into one searchable view. Tracks are grouped by artist and title while retaining all associated scale and progression contexts. Filters can narrow the collection by free-text search, scale, progression, or artist, and each entry links to YouTube and Spotify.
 
 ### Triads
 
